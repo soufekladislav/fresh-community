@@ -14,7 +14,7 @@ final class ARC_Access {
         add_action('edit_user_profile_update',[self::class,'save_admin']);
     }
     public static function invite_only(): bool {
-        return !ARC_Config::legacy_site() && ARC_Config::get('registration_mode')==='invite';
+        return ARC_Config::get('registration_mode')==='invite';
     }
     public static function member(int $uid=0): bool {
         if(!$uid)$uid=get_current_user_id();
