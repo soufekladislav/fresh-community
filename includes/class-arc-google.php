@@ -52,8 +52,8 @@ final class ARC_Google {
         $html = '';
         if (isset($_GET['arc_google_error'])) {
             $messages = [
-                'already_exists'=>'Tento e-mail už má účet Adrenaline Race. Přihlas se původním způsobem a v profilu si Google propoj.',
-                'email_mismatch'=>'Google účet má jiný e-mail než přihlášený účet Adrenaline Race. Zvol Google účet se stejným e-mailem.',
+                'already_exists'=>'Tento e-mail už má účet na tomto webu. Přihlas se původním způsobem a v profilu si Google propoj.',
+                'email_mismatch'=>'Google účet má jiný e-mail než přihlášený účet na tomto webu. Zvol Google účet se stejným e-mailem.',
                 'registrations_closed'=>'Registrace je aktuálně vypnutá. Přihlášení existujících účtů je dostupné.',
                 'already_linked'=>'Google účet už je propojený s jiným účtem, nebo je propojení nejednoznačné.',
                 'rate'=>'Příliš mnoho pokusů. Opakuj přihlášení později.',
@@ -89,7 +89,7 @@ final class ARC_Google {
             wp_send_json_error(['message'=>'Google účet se nepodařilo ověřit.'], 403);
         $email=sanitize_email((string)($claims['email']??''));
         if (!is_email($email) || strcasecmp($email,(string)wp_get_current_user()->user_email)!==0)
-            wp_send_json_error(['message'=>'Pro propojení musí mít Google účet stejný e-mail jako účet Adrenaline Race.'], 409);
+            wp_send_json_error(['message'=>'Pro propojení musí mít Google účet stejný e-mail jako účet na tomto webu.'], 409);
         $sub=(string)($claims['sub']??'');
         $matches=get_users(['meta_key'=>self::SUB_META, 'meta_value'=>$sub, 'fields'=>'ID', 'number'=>2]);
         foreach ($matches as $linked) {
@@ -158,7 +158,7 @@ final class ARC_Google {
                 'user_login'=>$username,
                 'user_pass'=>wp_generate_password(48, true, true),
                 'user_email'=>$email,
-                'display_name'=>trim(sanitize_text_field((string)($claims['name']??''))) ?: 'Člen Adrenaline Race',
+                'display_name'=>trim(sanitize_text_field((string)($claims['name']??''))) ?: 'Člen komunity',
                 'role'=>class_exists('WooCommerce') ? 'customer' : 'subscriber',
             ]);
             if (is_wp_error($uid) || !$uid) self::failure('create', $url);
