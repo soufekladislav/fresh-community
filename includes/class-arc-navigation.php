@@ -7,6 +7,9 @@ final class ARC_Navigation {
     public static function live_rendered(): void { self::$live_rendered=true; }
     /** Respect the installed WP page hierarchy instead of hardcoding /pratele vs /app/pratele. */
     public static function app_link(string $slug): string {
+        if($slug==='zpravy')return ARC_Setup::url('messages');
+        if($slug==='pratele' && ARC_Setup::id('friends'))return ARC_Setup::url('friends');
+        if($slug==='oznameni' && ARC_Setup::id('notifications'))return ARC_Setup::url('notifications');
         if(!in_array($slug,['pratele','oznameni'],true))return ARC_Config::app_url();
         $base=trim((string)wp_parse_url(ARC_Config::app_url(),PHP_URL_PATH),'/');
         foreach([($base ? $base.'/' : '').$slug,$slug] as $path){
@@ -15,7 +18,7 @@ final class ARC_Navigation {
         }
         return trailingslashit(ARC_Config::app_url()).$slug.'/';
     }
-    public static function desktop_bar_enabled(): bool {return is_user_logged_in() && !is_admin() && !wp_doing_ajax() && (ARC_Config::enabled('global_navigation') || self::community_route());}
+    public static function desktop_bar_enabled(): bool {return is_user_logged_in() && ARC_Access::member() && !is_admin() && !wp_doing_ajax() && (ARC_Config::enabled('global_navigation') || self::community_route());}
     public static function topbar_enabled(): bool {return !is_admin() && !wp_doing_ajax() && (is_user_logged_in() || self::community_route());}
     public static function boot(): void {
         add_action('wp_enqueue_scripts',[self::class,'assets']);
@@ -34,6 +37,7 @@ final class ARC_Navigation {
     private static function community_route(): bool {
         if(is_admin())return false;
         if(ARC_Config::is_app_page())return class_exists('ARC_PWA') && ARC_PWA::on_live();
+        foreach(['wall','account','profile','people','friends','messages','notifications'] as $key){$id=ARC_Setup::id($key);if($id && is_page($id))return true;}
         if(is_page(['pratele','profil','premium','oznameni','ulozene']))return true;
         if(function_exists('is_wc_endpoint_url') && is_wc_endpoint_url('ar-community'))return true;
         // Site's account endpoint may be nested under /app/muj-ucet/ in a custom permalink setup.
@@ -90,7 +94,7 @@ final class ARC_Navigation {
         }
         $me=wp_get_current_user();
         $account=class_exists('AR_Community')?AR_Community::community_account_url():home_url('/muj-ucet/');
-        $links=[[ARC_Config::name(),ARC_Config::app_url()],['Přátelé',self::app_link('pratele')],['Oznámení',self::app_link('oznameni')]];
+        $links=[[ARC_Config::name(),ARC_Config::app_url()],['Přátelé',self::app_link('pratele')],['Zprávy',self::app_link('zpravy')],['Oznámení',self::app_link('oznameni')]];
         if(ARC_Config::enabled('show_affiliate') && function_exists('wc_get_account_endpoint_url'))$links[]=['Referenční program',wc_get_account_endpoint_url('fresh-affiliate')];
         $html='<nav class="arc-userbar" aria-label="Rychlá navigace člena"><div class="arc-userbar-inner"><span class="arc-userbar-mobile-label">Přihlášený účet</span><div class="arc-userbar-links">';
         foreach($links as $l)$html.='<a href="'.esc_url($l[1]).'">'.esc_html($l[0]).'</a>';
@@ -106,7 +110,7 @@ final class ARC_Navigation {
         self::$floating_printed=true;
         wp_enqueue_style('arc-navigation',ARC_URL.'assets/navigation.css',[],ARC_VERSION);
         $profile=ARC_Data::member_url(get_current_user_id());
-        $items=[['home','Zeď',ARC_Config::app_url()],['users','Přátelé',self::app_link('pratele')],['bell','Oznámení',self::app_link('oznameni')],['user','Profil',$profile]];
+        $items=[['home','Zeď',ARC_Config::app_url()],['users','Přátelé',self::app_link('pratele')],['message-circle','Zprávy',self::app_link('zpravy')],['bell','Oznámení',self::app_link('oznameni')],['user','Profil',$profile]];
         if(ARC_Config::enabled('show_premium'))$items[]=['star','Premium',home_url('/premium/')];
         $icons=[
           'home'=>'<path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/>',
@@ -114,8 +118,10 @@ final class ARC_Navigation {
           'user'=>'<circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/>',
           'bell'=>'<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/>',
           'star'=>'<path d="m12 2 3 6.4 7 1-5 4.9 1.2 7-6.2-3.3-6.2 3.3 1.2-7-5-4.9 7-1z"/>',
+          'message-circle'=>'<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8A8.5 8.5 0 0 1 12.5 3H13a8.5 8.5 0 0 1 8 8v.5z"/>',
         ];
         $route=ARC_Config::is_app_page()?'home':(is_page('pratele')?'users':(is_page('premium')?'star':(is_page('oznameni')?'bell':(is_page('profil')?'user':''))));
+        if(ARC_Setup::id('messages') && is_page(ARC_Setup::id('messages')))$route='message-circle';
         if(function_exists('is_wc_endpoint_url')&&is_wc_endpoint_url('ar-community'))$route='user';
         $currentPath=trim((string)wp_parse_url((string)($_SERVER['REQUEST_URI']??''),PHP_URL_PATH),'/');
         if(is_user_logged_in() && preg_match('~(?:^|/)muj-ucet/ar-community(?:/|$)~',$currentPath))$route='user';
