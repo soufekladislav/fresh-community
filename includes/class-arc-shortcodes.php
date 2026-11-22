@@ -259,22 +259,22 @@ final class ARC_Shortcodes {
         $avatarHtml=$avatar?'<img class="arc-profile-avatar" src="'.esc_url($avatar).'" alt="Fotografie profilu" width="132" height="132">':'<span class="arc-profile-avatar arc-profile-avatar-blank" aria-hidden="true">'.esc_html(mb_substr(ARC_Profile::display_alias($id),0,1)).'</span>';
         $bio=ARC_Profile::bio_html((string)get_user_meta($id,ARC_Data::META_BIO,true));
         $scopeText=['private'=>'Soukromý – pouze já','network'=>'Jen potvrzení přátelé','public'=>'Veřejný – všichni'][ARC_Profile::visibility($id)]??'Soukromý';
-        $html='<div class="arc-wrap arc-public-profile"><header class="arc-public-hero">'.$avatarHtml.'<div class="arc-public-hero-text"><h1>'.esc_html(ARC_Profile::display_alias($id)).'</h1><p class="arc-public-visibility">Viditelnost profilu: '.esc_html($scopeText).'</p><div class="arc-public-bio">'.($bio!==''?wpautop($bio):'<p>Člen komunity Adrenaline Race</p>').'</div>';
+        $html='<div class="arc-wrap arc-public-profile"><header class="arc-public-hero">'.$avatarHtml.'<div class="arc-public-hero-text"><h1>'.esc_html(ARC_Profile::display_alias($id)).'</h1><p class="arc-public-visibility">Viditelnost profilu: '.esc_html($scopeText).'</p><div class="arc-public-bio">'.($bio!==''?wpautop($bio):'<p>Člen komunity</p>').'</div>';
         $interests=sanitize_text_field((string)get_user_meta($id,ARC_Data::META_INTERESTS,true));
         if($interests!=='') {
-            $html.='<div class="arc-profile-interests"><strong>Oblíbené sporty</strong><div class="arc-interest-tags">';
+            $html.='<div class="arc-profile-interests"><strong>Zájmy</strong><div class="arc-interest-tags">';
             foreach(array_filter(array_map('trim',explode(',',$interests))) as $interest)$html.='<span>'.esc_html($interest).'</span>';
             $html.='</div></div>';
         }
         $profession=sanitize_text_field((string)get_user_meta($id,'_arc_sport_profession',true));
         $experience=sanitize_textarea_field((string)get_user_meta($id,'_arc_sport_experience',true));
-        if($profession!=='' || $experience!=='') {
+        if(ARC_Config::enabled('sport_fields') && ($profession!=='' || $experience!=='')) {
             $html.='<section class="arc-profile-professional"><h2>Sportovní profese a zkušenosti</h2>';
             if($profession!=='') $html.='<strong>'.esc_html($profession).'</strong>';
             if($experience!=='') $html.='<div>'.wpautop(esc_html($experience)).'</div>';
             $html.='</section>';
         }
-        if($owner)$html.='<p><a class="arc-account-link" href="'.esc_url(function_exists('wc_get_account_endpoint_url')?wc_get_account_endpoint_url('ar-community'):ARC_Config::app_url())).'">Upravit můj profil</a></p>';
+        if($owner)$html.='<p><a class="arc-account-link" href="'.esc_url(function_exists('wc_get_account_endpoint_url')?wc_get_account_endpoint_url('ar-community'):ARC_Config::app_url()).'">Upravit můj profil</a></p>';
         if($owner){
         $html.='</div><aside class="arc-profile-social"><h2>Přátelé</h2><p class="arc-profile-vis"><strong>Viditelnost profilu:</strong> '.esc_html(['private'=>'Soukromý – pouze já','network'=>'Jen potvrzení přátelé','public'=>'Veřejný – všichni'][ARC_Profile::visibility($id)]??'Soukromý').'</p>';
         $allFriends=ARC_Relations::connected_ids($id);
