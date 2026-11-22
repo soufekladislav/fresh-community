@@ -21,7 +21,7 @@
    b.append(el('strong','',u.name));
    if(u.unread)b.append(el('span','arc-msg-unread',u.unread));
    if(u.latest)b.append(el('small','',u.latest));
-   b.addEventListener('click',()=>{selected=u.id;selectedName=u.name;history.replaceState(null,'',location.pathname+'?with='+selected);friends();load();});
+   b.addEventListener('click',()=>{selected=u.id;selectedName=u.name;window.history.replaceState(null,'',location.pathname+'?with='+selected);friends();load();});
    list.append(b);
    if(selected===u.id)selectedName=u.name;
   }
