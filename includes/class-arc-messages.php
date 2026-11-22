@@ -92,8 +92,9 @@ final class ARC_Messages {
         global $wpdb;$table=self::table();
         $ok=$wpdb->insert($table,['sender_id'=>$me,'recipient_id'=>$peer,'body'=>$body,'created_at'=>current_time('mysql',true)],['%d','%d','%s','%s']);
         if(!$ok)return new WP_Error('arc_message_storage','Zprávu nelze uložit.',['status'=>500]);
-        ARC_Notifications::direct_message($me,$peer,(int)$wpdb->insert_id);
-        return ['ok'=>true,'id'=>(int)$wpdb->insert_id];
+        $id=(int)$wpdb->insert_id;
+        ARC_Notifications::direct_message($me,$peer,$id);
+        return ['ok'=>true,'id'=>$id];
     }
     public static function read(WP_REST_Request $r): array|WP_Error {
         nocache_headers();$peer=absint($r['peer']);if(!self::can_talk($peer))return self::denied();
