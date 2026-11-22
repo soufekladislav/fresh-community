@@ -27,6 +27,8 @@ final class ARC_Config {
             'show_affiliate' => $legacy ? 1 : 0,
             'show_youtube' => $legacy ? 1 : 0,
             'global_navigation' => $legacy ? 1 : 0,
+            'woo_dashboard' => $legacy ? 1 : 0,
+            'sport_fields' => $legacy ? 1 : 0,
         ];
     }
 
@@ -83,7 +85,7 @@ final class ARC_Config {
         $values['app_page_id'] = $page && get_post_type($page) === 'page' ? $page : 0;
         $url = esc_url_raw((string) wp_unslash($post['arc_shop_url'] ?? ''));
         $values['shop_url'] = $url;
-        foreach (['show_shop','show_premium','show_affiliate','show_youtube','global_navigation'] as $key) {
+        foreach (['show_shop','show_premium','show_affiliate','show_youtube','global_navigation','woo_dashboard','sport_fields'] as $key) {
             $values[$key] = !empty($post['arc_'.$key]) ? 1 : 0;
         }
         update_option(self::OPTION, array_replace($old, $values), false);
