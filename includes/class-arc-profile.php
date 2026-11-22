@@ -53,6 +53,8 @@ final class ARC_Profile {
         return $alias!==''?$alias:'Člen #'.$uid;
     }
     public static function can_view(int $uid,int $viewer): bool {
+        // A public WP customer profile must not automatically enter a closed community directory.
+        if(ARC_Access::invite_only() && !ARC_Access::member($uid) && !($viewer && user_can($viewer,'manage_options')))return false;
         if($viewer && ($viewer===$uid || user_can($viewer,'manage_options'))) return true;
         if(get_user_meta($uid,'_arc_community_suspended',true))return false;
         $v=self::visibility($uid);
