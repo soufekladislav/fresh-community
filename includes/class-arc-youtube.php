@@ -240,7 +240,7 @@ final class ARC_YouTube {
     }
     private static function member_go(string $note): void {
         $referer=wp_get_referer();
-        $url=$referer && wp_validate_redirect($referer,false)?$referer:home_url('/app/');
+        $url=$referer && wp_validate_redirect($referer,false)?$referer:ARC_Config::app_url();
         wp_safe_redirect(add_query_arg('arc_youtube',$note,remove_query_arg('arc_youtube',$url)));exit;
     }
     public static function shortcode(): string {
@@ -256,7 +256,7 @@ final class ARC_YouTube {
             'limit'=>'Limit jsou 3 videa za 24 hodin.'];
         echo '<div class="arc-yt-form-box">';
         if (isset($messages[$note]))echo '<p role="status" class="arc-yt-status">'.esc_html($messages[$note]).'</p>';
-        echo '<p><strong>Navrhni video na oficiální YouTube kanál Adrenaline Race</strong></p>';
+        echo '<p><strong>Navrhni video na komunitní YouTube kanál</strong></p>';
         echo '<p>Video nejprve schválí správce. Po schválení se zveřejní veřejně na YouTube a může se objevit na komunitní zdi.</p>';
         echo '<form action="'.esc_url(admin_url('admin-post.php')).'" method="post" enctype="multipart/form-data" class="arc-yt-form">';
         echo '<input type="hidden" name="action" value="arc_yt_submit">';wp_nonce_field('arc_yt_submit');
@@ -264,7 +264,7 @@ final class ARC_YouTube {
         echo '<label>Popis <textarea name="arc_yt_description" maxlength="4500" rows="3"></textarea></label>';
         echo '<label>Video <input name="arc_yt_video" type="file" accept="video/mp4,video/quicktime,video/webm,video/x-matroska,video/x-m4v,.mp4,.mov,.webm,.mkv,.m4v" required></label>';
         echo '<small>Max. '.esc_html(size_format($limit)).'. Mobil může nabídnout fotoaparát nebo galerii. Nahrávání vyžaduje dostatečné limity PHP.</small>';
-        echo '<label class="arc-yt-consent"><input type="checkbox" name="arc_yt_consent" value="1" required> Potvrzuji, že jsem autorem videa nebo mám práva k jeho zveřejnění, mám souhlas zachycených osob a souhlasím s veřejným zveřejněním na YouTube kanálu Adrenaline Race.</label>';
+        echo '<label class="arc-yt-consent"><input type="checkbox" name="arc_yt_consent" value="1" required> Potvrzuji, že jsem autorem videa nebo mám práva k jeho zveřejnění, mám souhlas zachycených osob a souhlasím s veřejným zveřejněním na YouTube kanálu komunity.</label>';
         echo '<button type="submit" class="arc-live-button">Odeslat video ke schválení</button></form></div>';
     }
     public static function menu(): void {
