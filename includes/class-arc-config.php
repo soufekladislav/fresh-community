@@ -29,6 +29,10 @@ final class ARC_Config {
             'global_navigation' => $legacy ? 1 : 0,
             'woo_dashboard' => $legacy ? 1 : 0,
             'sport_fields' => $legacy ? 1 : 0,
+            'icon_192' => '',
+            'icon_512' => '',
+            'theme_color' => '#343434',
+            'background_color' => '#FFFFFF',
         ];
     }
 
@@ -66,6 +70,22 @@ final class ARC_Config {
         return true;
     }
 
+    public static function icon_url(int $size): string {
+        $size = $size === 512 ? 512 : 192;
+        $custom = esc_url_raw((string) self::get('icon_'.$size));
+        if ($custom) return $custom;
+        if (!self::legacy_site() && function_exists('get_site_icon_url')) {
+            $site = get_site_icon_url($size);
+            if ($site) return (string) $site;
+        }
+        return ARC_URL.'assets/pwa-icon-'.$size.'.png';
+    }
+
+    public static function color(string $key): string {
+        $value = sanitize_hex_color((string) self::get($key));
+        return $value ?: ($key === 'background_color' ? '#FFFFFF' : '#343434');
+    }
+
     public static function shop_url(): string {
         $url = (string) self::get('shop_url');
         return $url !== '' ? $url : home_url('/');
@@ -85,6 +105,10 @@ final class ARC_Config {
         $values['app_page_id'] = $page && get_post_type($page) === 'page' ? $page : 0;
         $url = esc_url_raw((string) wp_unslash($post['arc_shop_url'] ?? ''));
         $values['shop_url'] = $url;
+        foreach (['icon_192','icon_512'] as $key) $values[$key] = esc_url_raw((string) wp_unslash($post['arc_'.$key] ?? ''));
+        foreach (['theme_color','background_color'] as $key) {
+            $values[$key] = sanitize_hex_color((string) wp_unslash($post['arc_'.$key] ?? '')) ?: $defaults[$key];
+        }
         foreach (['show_shop','show_premium','show_affiliate','show_youtube','global_navigation','woo_dashboard','sport_fields'] as $key) {
             $values[$key] = !empty($post['arc_'.$key]) ? 1 : 0;
         }
