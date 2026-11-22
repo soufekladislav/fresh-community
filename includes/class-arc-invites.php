@@ -6,10 +6,10 @@ final class ARC_Invites {
     private const TTL=2592000; // 30 days
     private static function key(string $token): string { return 'arc_join_'.hash('sha256',$token); }
     public static function issue(int $inviter): string {
-        if(ARC_Profile::visibility($inviter)==='private')return '';
+        if(ARC_Profile::visibility($inviter)==='private' && !user_can($inviter,'manage_options'))return '';
         $token=bin2hex(random_bytes(24));
         set_transient(self::key($token),$inviter,self::TTL);
-        $url=add_query_arg('arc_invite',$token,function_exists('wc_get_page_permalink') ? wc_get_page_permalink('myaccount') : wp_registration_url());
+        $url=add_query_arg('arc_invite',$token,ARC_Config::app_url());
         if(class_exists('Fresh_Affiliate_DB') && class_exists('Fresh_Affiliate_Tracker')) {
             $affiliate=Fresh_Affiliate_DB::get_affiliate_by_user($inviter);
             if($affiliate && (string)$affiliate->status==='active') {
@@ -18,6 +18,7 @@ final class ARC_Invites {
         }
         return $url;
     }
+    public static function has_valid_cookie(): bool { return self::inviter(self::token())>0; }
     private static function token(): string {
         $raw=$_COOKIE[self::COOKIE]??'';
         return is_string($raw) && preg_match('/^[a-f0-9]{48}$/D',$raw)?$raw:'';
@@ -99,6 +100,7 @@ final class ARC_Invites {
         }
         $affiliateResult=ARC_Integrations::attribute_accepted_invite($inviter,$uid);
         if($affiliateResult==='other')ARC_Notifications::affiliate_conflict($uid,$inviter);
+        update_user_meta($uid,ARC_Access::APPROVED,'1');
         delete_transient(self::key($token));self::clear_cookie();
         return ['ok'=>true,'message'=>'Pozvánka přijata, nyní jste přátelé.'];
     }
