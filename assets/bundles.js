@@ -125,8 +125,8 @@ const openExternal=async(id,channel)=>{
  try{status('Připravuji veřejný odkaz na zeď…');
   const res=await api('collections/'+id+'/share',{method:'POST',body:JSON.stringify({mode:'wall'})});
   const c=kit(id),url=String(res.url||'');if(!url||!c)throw Error('Odkaz se nepodařilo vytvořit.');
-  const body='Podívej se na můj balíček vybavení na Adrenaline Race: '+c.title+' '+url;
-  if(channel==='email')location.href='mailto:?subject='+encodeURIComponent('Balíček výbavy z Adrenaline Race')+'&body='+encodeURIComponent(body);
+  const body='Podívej se na můj balíček vybavení v '+(ARC.name||'komunitě')+': '+c.title+' '+url;
+  if(channel==='email')location.href='mailto:?subject='+encodeURIComponent('Balíček vybavení z komunity')+'&body='+encodeURIComponent(body);
   else location.href='https://wa.me/?text='+encodeURIComponent(body);
   status('Odkaz na veřejný příspěvek je připravený.');
  }catch(err){status(err.message,true);}
