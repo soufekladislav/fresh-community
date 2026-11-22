@@ -205,6 +205,7 @@ final class AR_Community {
      *  The legacy /muj-ucet/ login/registration form remains in place for guests.
      */
     public static function community_account_url(): string {
+        if(!ARC_Config::legacy_site() && ARC_Setup::id('account'))return ARC_Setup::url('account');
         $page=ARC_Config::legacy_site() ? get_page_by_path('app/muj-ucet', OBJECT, 'page') : null;
         if($page instanceof WP_Post && $page->post_status==='publish') {
             $url=get_permalink($page);
