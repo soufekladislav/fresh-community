@@ -94,7 +94,9 @@ final class ARC_Navigation {
         }
         $me=wp_get_current_user();
         $account=class_exists('AR_Community')?AR_Community::community_account_url():home_url('/muj-ucet/');
-        $links=[[ARC_Config::name(),ARC_Config::app_url()],['Přátelé',self::app_link('pratele')],['Zprávy',self::app_link('zpravy')],['Oznámení',self::app_link('oznameni')]];
+        $links=[[ARC_Config::name(),ARC_Config::app_url()],['Přátelé',self::app_link('pratele')]];
+        if(ARC_Setup::id('messages'))$links[]=['Zprávy',self::app_link('zpravy')];
+        $links[]=['Oznámení',self::app_link('oznameni')];
         if(ARC_Config::enabled('show_affiliate') && function_exists('wc_get_account_endpoint_url'))$links[]=['Referenční program',wc_get_account_endpoint_url('fresh-affiliate')];
         $html='<nav class="arc-userbar" aria-label="Rychlá navigace člena"><div class="arc-userbar-inner"><span class="arc-userbar-mobile-label">Přihlášený účet</span><div class="arc-userbar-links">';
         foreach($links as $l)$html.='<a href="'.esc_url($l[1]).'">'.esc_html($l[0]).'</a>';
@@ -110,7 +112,10 @@ final class ARC_Navigation {
         self::$floating_printed=true;
         wp_enqueue_style('arc-navigation',ARC_URL.'assets/navigation.css',[],ARC_VERSION);
         $profile=ARC_Data::member_url(get_current_user_id());
-        $items=[['home','Zeď',ARC_Config::app_url()],['users','Přátelé',self::app_link('pratele')],['message-circle','Zprávy',self::app_link('zpravy')],['bell','Oznámení',self::app_link('oznameni')],['user','Profil',$profile]];
+        $items=[['home','Zeď',ARC_Config::app_url()],['users','Přátelé',self::app_link('pratele')]];
+        if(ARC_Setup::id('messages'))$items[]=['message-circle','Zprávy',self::app_link('zpravy')];
+        $items[]=['bell','Oznámení',self::app_link('oznameni')];
+        $items[]=['user','Profil',$profile];
         if(ARC_Config::enabled('show_premium'))$items[]=['star','Premium',home_url('/premium/')];
         $icons=[
           'home'=>'<path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/>',
