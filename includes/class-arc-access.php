@@ -31,7 +31,10 @@ final class ARC_Access {
     }
     public static function woo_registration_errors(WP_Error $errors,$username='',$password='',$email=''): WP_Error {
         // Shop checkout may create a Woo customer, but never silently grants community membership.
-        if(function_exists('is_checkout') && is_checkout())return $errors;
+        $checkout=(function_exists('is_checkout') && is_checkout())
+            || (isset($_REQUEST['wc-ajax']) && sanitize_key((string)wp_unslash($_REQUEST['wc-ajax']))==='checkout')
+            || (function_exists('did_action') && did_action('woocommerce_checkout_process')>0);
+        if($checkout)return $errors;
         if(!self::can_register())$errors->add('arc_invite_required','Pro vstup do komunity potřebuješ platnou pozvánku.');
         return $errors;
     }
