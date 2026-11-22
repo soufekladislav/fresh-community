@@ -10,15 +10,17 @@ Aktualizace: 22. 11. 2026. Větev pro první instalaci navazuje na PR #17 (zobec
 | Priorita | Funkce | Stav | Vztah na Issue / PR |
 |---|---|---|---|
 | P0 | Zobecnění značky/URL, volitelné moduly | Kód v PR #17, čeká na QA | #11, #17 |
-| P0 | První instalace: idempotentní založení stránek | Kód v navazujícím PR, čeká na QA | první instalace |
-| P0 | Veřejná vs. pozvánková registrace a přístup | Kód v navazujícím PR, čeká na bezpečnostní QA | přístup |
-| P0 | 1:1 zprávy přátel, oznámení | Beta kód v navazujícím PR, čeká na QA | chat |
-| P0 | Test na čistém WP + regresní test Adrenaline Live | Neprovedeno | #12 |
+| P0 | První instalace: idempotentní založení stránek | Kód v PR #18, čeká na QA | #19, #20 |
+| P0 | Veřejná vs. pozvánková registrace a přístup | Kód v PR #18, čeká na bezpečnostní QA | #21 |
+| P0 | 1:1 zprávy přátel, oznámení | Beta kód v PR #18, čeká na QA | #22 |
+| P0 | Test na čistém WP + regresní test Adrenaline Live | Neprovedeno | #12, #23 |
 | P1 | Základ: profily, zeď, reakce, přátelé | Implementováno dříve, QA chybí | #1–4 |
 | P1 | Uložené produkty/obsah, Woo | Implementováno dříve, QA chybí | #5 |
 | P1 | E-maily, správce, oznámení | Implementováno dříve, QA chybí | #6 |
 | P1 | PWA instalace / aktualizace | Částečně, QA chybí | #7 |
-| P1 | Bezpečnost, moderace, retence dat | Nedokončeno | #14 |
+| P0 | GDPR: retenční pravidla, export a mazání soukromých zpráv | Chybí před veřejným provozem | #24 |
+| P1 | První zapojení členů a správní nastavení | Plán po QA | #25 |
+| P1 | Moderace ostatního komunitního obsahu | Nedokončeno | #14 |
 | P2 | Prohlížečové push notifikace | Chybí celé doručování | #8 |
 | P2 | YouTube kanál a schvalování | Implementováno, QA chybí | #9 |
 | P2 | Premium/Stripe kompatibilita | Nutná regresní kontrola | #10 |
