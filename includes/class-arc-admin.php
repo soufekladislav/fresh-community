@@ -69,6 +69,11 @@ final class ARC_Admin {
         foreach(['show_shop'=>'Zobrazit produkty z WooCommerce','show_premium'=>'Zobrazit položky Premium','show_affiliate'=>'Zobrazit referenční program','show_youtube'=>'Nabídnout odesílání videa na YouTube','global_navigation'=>'Zobrazovat spodní navigaci na všech stránkách webu','woo_dashboard'=>'Nahradit úvodní nástěnku WooCommerce komunitou','sport_fields'=>'Zobrazovat sportovní údaje v profilu'] as $key=>$label){
             echo '<p><label><input type="checkbox" name="arc_'.esc_attr($key).'" value="1" '.checked(!empty($config[$key]),true,false).'> '.esc_html($label).'</label></p>';
         }
+        echo '<h3>Vzhled instalované aplikace (PWA)</h3>';
+        foreach (['icon_192'=>'Ikona 192×192 (URL z Knihovny médií)','icon_512'=>'Ikona 512×512 (URL z Knihovny médií)','theme_color'=>'Barva aplikace (#RRGGBB)','background_color'=>'Barva pozadí (#RRGGBB)'] as $key=>$label) {
+            echo '<p><label><strong>'.esc_html($label).'</strong><br><input class="regular-text" name="arc_'.esc_attr($key).'" value="'.esc_attr((string)$config[$key]).'"></label></p>';
+        }
+        echo '<p class="description">Nevyplněná ikona použije existující ikonu Adrenaline Live pro původní instalaci nebo Site Icon WordPressu pro novou komunitu. Změna ikony či PWA stránky vyžaduje otestování instalované aplikace na zařízeních.</p>';
         echo '<h2>Další nastavení a stránky</h2>';
         foreach(['profile'=>'Sdílená šablona profilu /profil/','people'=>'Adresář Lidé (historický)','library'=>'Veřejné balíčky','advisor'=>'Osobní poradce'] as $key=>$label) {
             echo '<p><label><strong>'.esc_html($label).'</strong> ';wp_dropdown_pages(['name'=>'arc_page_'.$key,'selected'=>absint(get_option('arc_page_'.$key,0)),
