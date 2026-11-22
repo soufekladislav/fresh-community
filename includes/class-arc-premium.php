@@ -3,6 +3,8 @@ defined('ABSPATH') || exit;
 /** Paid applications hub. Existing legacy billing stays untouched. */
 final class ARC_Premium {
     public static function catalog(): array {
+        // The legacy AR catalogue belongs to Adrenaline Live only.
+        if(!ARC_Config::legacy_site()) return [];
         return [
           ['key'=>'ar-jidelnicek','label'=>'AR Jídelníček','description'=>'Jídelníček, plán pohybu a energetická kalkulačka','status'=>'available','url'=>home_url('/premium/jidelnicek/')],
           ['key'=>'cykloservisy','label'=>'Mapa cykloservisů','description'=>'Vyhledávání servisů kol','status'=>'planned'],
@@ -37,7 +39,7 @@ final class ARC_Premium {
     public static function render(): string {
         wp_enqueue_style('arc-live',ARC_URL.'assets/live.css',[],ARC_VERSION);
         $access=self::access(get_current_user_id());
-        $out='<section class="arc-premium-hub"><div class="arc-premium-intro"><span>ADRENALINE LIVE PREMIUM</span><h1>Více možností pro aktivní život</h1><p>Komunita je zdarma. Nadstandardní aplikace postupně přibývají podle potřeb členů.</p></div><div class="arc-premium-grid">';
+        $out='<section class="arc-premium-hub"><div class="arc-premium-intro"><span>'.esc_html(ARC_Config::name()).' PREMIUM</span><h1>Více možností pro aktivní život</h1><p>Komunita je zdarma. Nadstandardní aplikace postupně přibývají podle potřeb členů.</p></div><div class="arc-premium-grid">';
         foreach($access['apps'] as $app){
             $key=sanitize_key((string)($app['key']??''));$label=esc_html((string)($app['label']??''));
             $available=($app['status']??'')==='available' && in_array($key,$access['entitlements'],true);
