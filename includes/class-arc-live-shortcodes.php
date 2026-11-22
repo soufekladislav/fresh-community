@@ -7,6 +7,7 @@ final class ARC_Live_Shortcodes {
         add_shortcode('ar_live_premium',[ARC_Premium::class,'render']);
     }
     public static function app(): string {
+        if(!ARC_Access::member() && ARC_Access::invite_only())return ARC_Access::denied();
         if(isset($_GET['ar_member'])) return ARC_Shortcodes::profile();
         ARC_Shortcodes::assets(); // One existing favorite handler shared with WooCommerce and Saved.
         wp_enqueue_style('arc-live',ARC_URL.'assets/live.css',[],ARC_VERSION);
