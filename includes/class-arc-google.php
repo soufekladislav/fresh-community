@@ -54,7 +54,7 @@ final class ARC_Google {
             $messages = [
                 'already_exists'=>'Tento e-mail už má účet na tomto webu. Přihlas se původním způsobem a v profilu si Google propoj.',
                 'email_mismatch'=>'Google účet má jiný e-mail než přihlášený účet na tomto webu. Zvol Google účet se stejným e-mailem.',
-                'registrations_closed'=>'Registrace je aktuálně vypnutá. Přihlášení existujících účtů je dostupné.',
+                'registrations_closed'=>'Registrace Google účtu není v tomto režimu povolena. Pro pozvané členy použij registraci e-mailem, potom lze Google připojit.',
                 'already_linked'=>'Google účet už je propojený s jiným účtem, nebo je propojení nejednoznačné.',
                 'rate'=>'Příliš mnoho pokusů. Opakuj přihlášení později.',
             ];
@@ -150,7 +150,7 @@ final class ARC_Google {
             // Never silently merge an email-only match: require existing WP login to link accounts.
             if (email_exists($email)) self::failure('already_exists', $url);
             $registration_allowed = (bool)get_option('users_can_register') || get_option('woocommerce_enable_myaccount_registration') === 'yes';
-            if (!$registration_allowed) self::failure('registrations_closed', $url);
+            if (!$registration_allowed || ARC_Access::invite_only()) self::failure('registrations_closed', $url);
             $prefix = 'ar_google_'.substr(hash('sha256', $sub), 0, 14);
             $username = $prefix;
             if (username_exists($username)) $username .= '_'.wp_rand(10000,99999);
