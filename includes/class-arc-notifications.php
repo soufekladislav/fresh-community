@@ -44,7 +44,7 @@ final class ARC_Notifications {
                 'post','friend_share'=>$who.' sdílel/a nový komunitní příspěvek.',
                 'article'=>$who.' publikoval/a nový článek.',
                 'broadcast'=>get_the_title((int)$r->object_id),
-                default=>'Nové oznámení z Adrenaline Live.',
+                default=>'Nové oznámení z '.ARC_Config::name().'.',
             };
             if($r->kind==='broadcast'){
                 $post=get_post((int)$r->object_id);
@@ -53,7 +53,7 @@ final class ARC_Notifications {
                 $target=(string)get_post_meta($post->ID,'_arc_target_url',true);
                 if($target && str_starts_with($target,home_url('/')))$link=$target;
             }
-            $subject='Adrenaline Live – nové oznámení';
+            $subject=ARC_Config::name().' – nové oznámení';
             $body="Ahoj,\n\n".wp_strip_all_tags($message)."\n\nZobrazit oznámení: ".$link."\n\nE-mailová oznámení můžeš vypnout v Moje komunita → Můj profil.";
             wp_mail($user->user_email,$subject,$body);
         }
@@ -123,15 +123,15 @@ final class ARC_Notifications {
                     $campaign=get_post((int)$r->object_id);
                     if(!$campaign || $campaign->post_type!=='arc_broadcast')continue 2;
                     $message=wp_strip_all_tags($campaign->post_title);
-                    $link=esc_url_raw((string)get_post_meta($campaign->ID,'_arc_target_url',true))?:home_url('/app/');
+                    $link=esc_url_raw((string)get_post_meta($campaign->ID,'_arc_target_url',true))?:ARC_Config::app_url();
                     break;
                 case 'accepted':$message=$name.' přijal/a tvou pozvánku.';break;
                 case 'affiliate_other':$message=$name.' je nyní tvým přítelem, ale už patří jinému referenčnímu partnerovi.';break;
-                case 'comment':$post=get_post((int)$r->object_id);if(!$post || !ARC_Wall::can_read($post,$user))continue 2;$message=$name.' napsal/a komentář nebo odpověď.';$link=add_query_arg('arc_post',$post->ID,home_url('/app/'));break;
+                case 'comment':$post=get_post((int)$r->object_id);if(!$post || !ARC_Wall::can_read($post,$user))continue 2;$message=$name.' napsal/a komentář nebo odpověď.';$link=add_query_arg('arc_post',$post->ID,ARC_Config::app_url());break;
                 case 'post':
                     $post=get_post((int)$r->object_id);
                     if(!$post || !ARC_Wall::can_read($post,$user))continue 2;
-                    $message=$name.' zveřejnil/a nový příspěvek.';$link=home_url('/app/');break;
+                    $message=$name.' zveřejnil/a nový příspěvek.';$link=ARC_Config::app_url();break;
                 case 'friend_share':
                     $post=get_post((int)$r->object_id);
                     if(!$post || !ARC_Wall::can_read($post,$user))continue 2;
