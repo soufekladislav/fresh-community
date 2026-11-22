@@ -1,5 +1,5 @@
 # Fresh Community
-**WordPress plugin pro vlastní mikrokomunitu** · vývojová verze `0.2.0-beta.10.17`.
+**WordPress plugin pro vlastní mikrokomunitu** · vývojová verze `0.2.0-beta.10.18`.
 
 Fresh Community přidává na stávající WordPress web komunitní zeď, členské profily, přátele, pozvánky, příspěvky, reakce, komentáře, oznámení, zpětnou vazbu a možnost PWA instalace. Referenční implementace se jmenuje **Adrenaline Live** na Adrenaline Race. Cílem je použitelný základ také pro jiné komunity, např. Fresh Develop nebo podnikatelskou komunitu Fresh Crackers.
 
@@ -28,9 +28,12 @@ Aktualizační ZIP vytvoříte:
 ```bash
 bash scripts/build-update.sh
 ```
-Výstup do `dist/fresh-community-0.2.0-beta.10.17-update.zip`. Soubory můžete nahrát jako **náhradu stávajícího pluginu** přes administraci WordPressu. Automatický update server prozatím není součástí projektu.
+Výstup do `dist/fresh-community-0.2.0-beta.10.18-update.zip`. Soubory můžete nahrát jako **náhradu stávajícího pluginu** přes administraci WordPressu. Automatický update server prozatím není součástí projektu.
 
 Podrobný postup: [Aktualizace a nastavení](docs/AKTUALIZACE-A-NASTAVENI.md).
+
+## První instalace a komunikátor
+Pro čistý web otevřete **Fresh Community → První instalace** a bezpečně založte chybějící stránky (zeď, Moje komunita, profil, členové, přátelé, soukromé zprávy, oznámení). Registrace je nastavitelná jako veřejná nebo pouze na pozvánku. Soukromý textový chat funguje mezi potvrzenými přáteli a zatím je v beta režimu. Viz [První instalace a testy](docs/PRVNI-INSTALACE.md) a [stav projektu](docs/STAV-PROJEKTU.md).
 
 ## Struktura
 - `ar-community.php` — hlavička pluginu, bootstrap a verze
