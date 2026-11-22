@@ -16,6 +16,8 @@ final class ARC_Saved {
     }
     /** One-time, non-destructive creation of the /ulozene/ page; never override existing content. */
     public static function ensure_page(): void {
+        // Fresh installations create community pages only on explicit admin request.
+        if(!ARC_Config::legacy_site())return;
         if(get_option('arc_saved_page_checked_v1'))return;
         $existing=get_page_by_path('ulozene',OBJECT,'page');
         if($existing instanceof WP_Post){
