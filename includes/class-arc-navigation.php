@@ -15,7 +15,7 @@ final class ARC_Navigation {
         }
         return trailingslashit(ARC_Config::app_url()).$slug.'/';
     }
-    public static function desktop_bar_enabled(): bool {return ARC_Config::enabled('global_navigation') && is_user_logged_in() && !is_admin() && !wp_doing_ajax();}
+    public static function desktop_bar_enabled(): bool {return is_user_logged_in() && !is_admin() && !wp_doing_ajax() && (ARC_Config::enabled('global_navigation') || self::community_route());}
     public static function topbar_enabled(): bool {return !is_admin() && !wp_doing_ajax() && (is_user_logged_in() || self::community_route());}
     public static function boot(): void {
         add_action('wp_enqueue_scripts',[self::class,'assets']);
