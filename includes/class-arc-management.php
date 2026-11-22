@@ -24,7 +24,7 @@ final class ARC_Management {
     }
     public static function members(): void {
         self::denied();
-        echo '<div class="wrap"><h1>AR Community – členové sítě</h1><p>Správa veřejné prezentace a komunitních oprávnění. Blokace komunity nemaže účet ani nezastavuje WooCommerce objednávky či affiliate provize.</p>';
+        echo '<div class="wrap"><h1>Fresh Community – členové sítě</h1><p>Správa veřejné prezentace a komunitních oprávnění. Blokace komunity nemaže účet ani nezastavuje WooCommerce objednávky či affiliate provize.</p>';
         if(isset($_GET['saved']))echo '<div class="notice notice-success"><p>Změny profilu byly uloženy.</p></div>';
         if(isset($_GET['friend_updated']))echo '<div class="notice notice-success"><p>Přátelství bylo upraveno. Affiliate vazby se nezměnily.</p></div>';
         if(isset($_GET['member_deleted']))echo '<div class="notice notice-success"><p>Testovací účet byl odebrán. Komunitní profil a aktivní affiliate vazby byly vyčištěny. Účetní historie zůstává zachována.</p></div>';
@@ -232,14 +232,14 @@ final class ARC_Management {
         wp_safe_redirect(add_query_arg(['page'=>'arc-members','user_id'=>$id,'saved'=>1],admin_url('admin.php')));exit;
     }
     public static function messages(): void {
-        self::denied();echo '<div class="wrap"><h1>AR Community – centrum oznámení</h1>';
+        self::denied();echo '<div class="wrap"><h1>Fresh Community – centrum oznámení</h1>';
         echo '<p>Interní oznámení členům sítě. Promo se doručí pouze členům, kteří výslovně povolili obchodní zprávy. Prohlížečové push zprávy nejsou aktivované. Provozní e-mailová oznámení jsou zapnutá, pokud je člen nevypne ve svém profilu; obchodní e-maily vyžadují souhlas.</p>';
         if(isset($_GET['created']))echo '<div class="notice notice-success"><p>Oznámení zařazeno do fronty. WordPress Cron zpracuje postupně jednotlivé účty.</p></div>';
         echo '<form method="post" action="'.esc_url(admin_url('admin-post.php')).'"><input type="hidden" name="action" value="arc_send_broadcast">';wp_nonce_field('arc_send_broadcast');
         echo '<table class="form-table"><tr><th>Typ</th><td><select name="message_type"><option value="service">Provozní informace sítě</option><option value="promo">Dobrovolné obchodní oznámení</option></select></td></tr>';
         echo '<tr><th>Komu</th><td><select name="audience"><option value="all">Všichni způsobilí členové</option><option value="affiliate">Affiliate partneři</option><option value="business">Obchodní partneři</option></select></td></tr>';
         echo '<tr><th>Zpráva</th><td><input name="title" class="large-text" maxlength="220" required placeholder="Nová výzva v komunitě"></td></tr>';
-        echo '<tr><th>Odkaz</th><td><input name="target_url" class="large-text" type="url" value="'.esc_attr(home_url('/app/')).'"><p class="description">Odkaz musí vést na Adrenaline Race.</p></td></tr></table>';
+        echo '<tr><th>Odkaz</th><td><input name="target_url" class="large-text" type="url" value="'.esc_attr(ARC_Config::app_url()).'"><p class="description">Odkaz musí vést na tento web.</p></td></tr></table>';
         submit_button('Vytvořit a zařadit oznámení');echo '</form>';
         $posts=get_posts(['post_type'=>'arc_broadcast','post_status'=>'private','posts_per_page'=>15,'orderby'=>'date','order'=>'DESC']);
         echo '<h2>Poslední kampaně</h2><table class="widefat striped"><thead><tr><th>Oznámení</th><th>Typ</th><th>Cílení</th><th>Stav</th><th>Doručeno</th></tr></thead><tbody>';
