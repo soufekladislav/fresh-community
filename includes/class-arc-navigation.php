@@ -76,7 +76,7 @@ final class ARC_Navigation {
     public static function mobile_community_return(): void {
         if(!ARC_Config::enabled('global_navigation') || is_admin() || is_user_logged_in() || self::community_route() || self::$live_rendered)return;
         if(function_exists('is_checkout') && is_checkout())return;
-        echo '<a class="arc-mobile-community-return" href="'.esc_url(ARC_Config::app_url()).'" aria-label="Do komunity '.esc_attr(ARC_Config::name())"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Do komunity</span></a>';
+        echo '<a class="arc-mobile-community-return" href="'.esc_url(ARC_Config::app_url()).'" aria-label="Do komunity '.esc_attr(ARC_Config::name()).'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Do komunity</span></a>';
     }
     public static function topbar_action(): void {
         if(!self::topbar_enabled())return;
