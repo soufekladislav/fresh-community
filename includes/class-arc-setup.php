@@ -50,7 +50,13 @@ final class ARC_Setup {
         $saved=self::id($key);
         if ($saved) { $page=get_post($saved); if($page instanceof WP_Post)return $page; }
         $page=get_page_by_path($spec['slug'],OBJECT,'page');
-        return $page instanceof WP_Post ? $page : null;
+        if($page instanceof WP_Post)return $page;
+        // Adrenaline Live sometimes nests community screens under /app/.
+        if(ARC_Config::legacy_site()){
+            $nested=get_page_by_path('app/'.$spec['slug'],OBJECT,'page');
+            if($nested instanceof WP_Post && str_contains(self::source($nested),$spec['shortcode']))return $nested;
+        }
+        return null;
     }
     public static function install_pages(): void {
         if(!current_user_can('manage_options'))wp_die('Nemáš oprávnění.',403);
