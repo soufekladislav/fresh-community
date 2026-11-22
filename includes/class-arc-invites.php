@@ -6,7 +6,7 @@ final class ARC_Invites {
     private const TTL=2592000; // 30 days
     private static function key(string $token): string { return 'arc_join_'.hash('sha256',$token); }
     public static function issue(int $inviter): string {
-        if(ARC_Profile::visibility($inviter)==='private' && !user_can($inviter,'manage_options'))return '';
+        if(!ARC_Access::member($inviter) || (ARC_Profile::visibility($inviter)==='private' && !user_can($inviter,'manage_options')))return '';
         $token=bin2hex(random_bytes(24));
         set_transient(self::key($token),$inviter,self::TTL);
         $url=add_query_arg('arc_invite',$token,ARC_Config::app_url());
@@ -18,7 +18,10 @@ final class ARC_Invites {
         }
         return $url;
     }
-    public static function has_valid_cookie(): bool { return self::inviter(self::token())>0; }
+    public static function has_valid_cookie(): bool {
+        $inviter=self::inviter(self::token());
+        return $inviter>0 && get_userdata($inviter) && ARC_Access::member($inviter);
+    }
     private static function token(): string {
         $raw=$_COOKIE[self::COOKIE]??'';
         return is_string($raw) && preg_match('/^[a-f0-9]{48}$/D',$raw)?$raw:'';
@@ -67,6 +70,7 @@ final class ARC_Invites {
         global $wpdb;$table=ARC_Relations::table();
         $result=$wpdb->query($wpdb->prepare("INSERT INTO $table (user_id,target_id,kind,status,created_at) VALUES (%d,%d,'connection','accepted',%s) ON DUPLICATE KEY UPDATE status='accepted'",$inviter,$uid,current_time('mysql',true)));
         if($result===false || !ARC_Relations::connected($inviter,$uid))return;
+        update_user_meta($uid,ARC_Access::APPROVED,'1');
         ARC_Notifications::accepted($uid,$inviter);
         // Fresh Affiliate is the only attribution authority; never rewrite an existing lifetime assignment.
         if(class_exists('Fresh_Affiliate_Lifetime') && class_exists('Fresh_Affiliate_DB')){
