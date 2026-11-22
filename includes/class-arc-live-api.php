@@ -110,7 +110,7 @@ final class ARC_Live_API {
     /** Shop recommendations: match opted-in interests, then top up to 20 with publicly visible stock. */
     public static function gear(): array {
         self::fresh();
-        if(!function_exists('wc_get_products')) return ['items'=>[],'personalized'=>false];
+        if(!ARC_Config::enabled('show_shop') || !function_exists('wc_get_products')) return ['items'=>[],'personalized'=>false];
         $uid=get_current_user_id();
         $raw=$uid?(string)get_user_meta($uid,ARC_Data::META_INTERESTS,true):'';
         $keywords=array_values(array_filter(array_map('trim',preg_split('/[,;\n]+/u',mb_strtolower($raw)))));
