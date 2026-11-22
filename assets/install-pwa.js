@@ -46,7 +46,7 @@
  const instructions=()=>{
   if(isIOS())return isSafari()
    ?'Na iPhonu nebo iPadu v Safari klepněte na Sdílet (čtvereček se šipkou) → Přidat na plochu. Potom aplikaci spusťte z její ikony. Oznámení se povolují zvlášť.'
-   :'Na iPhonu/iPadu otevřete stránku '+appName+' v Safari a zvolte Sdílet → Přidat na plochu. Pro push upozornění pak aplikaci spouštějte z plochy.';
+   :'Na iPhonu/iPadu otevřete stránku '+appName+' v Safari a zvolte Sdílet → Přidat na plochu.';
   if(isAndroid())return 'V Chrome otevřete nabídku ⋮ a zvolte „Nainstalovat aplikaci“ nebo „Přidat na plochu“. Pokud se volba nezobrazí, nejprve otevřete '+appName+'.';
   if(isSafari())return 'V Safari otevřete nabídku Soubor → Přidat do Docku (pokud je dostupná). Pro další možnosti použijte nabídku Sdílení.';
   return 'V Chrome nebo Edge na PC klikněte na ikonu instalace na pravé straně adresního řádku, případně otevřete nabídku ⋮ → Instalovat aplikaci. Otevřete nejprve '+appName+', pokud se nabídka nezobrazuje.';
