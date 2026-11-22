@@ -3,7 +3,7 @@
  * Plugin Name: Fresh Community
  * Description: Konfigurovatelné komunitní prostředí pro WordPress – profily, přátelé, příspěvky a mikrokomunity.
  * Version: 0.2.0-beta.10.17
- * Update URI: https://freshcrackers.cz/fresh-community/
+ * Update URI: https://github.com/soufekladislav/fresh-community
  * Requires at least: 6.3
  * Requires PHP: 8.0
  * Text Domain: ar-community
