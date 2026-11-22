@@ -9,7 +9,7 @@ final class ARC_Saved {
     public static function url(string $tab='posts'): string {
         $page=self::page();
         $base=$page?get_permalink($page):(
-            function_exists('wc_get_account_endpoint_url')?wc_get_account_endpoint_url('ar-community'):home_url('/muj-ucet/')
+            function_exists('wc_get_account_endpoint_url')?wc_get_account_endpoint_url('ar-community'):ARC_Setup::url('account')
         );
         if(!$page)return $base.'#arc-saved-posts';
         return $base; // Combined screen: saved posts + favorite products.
