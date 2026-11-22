@@ -109,7 +109,7 @@ final class ARC_Saved {
                 $body=trim(wp_strip_all_tags($post->post_content));
                 $title=wp_trim_words($body,17,'…')?:'Komunitní příspěvek';
                 $image=ARC_Wall::photo((int)get_post_meta($id,'_arc_image_id',true),(int)$post->post_author);
-                $url=home_url('/app/?arc_post='.$id); // Feed only: private CPT has no public permalink.
+                $url=add_query_arg('arc_post',$id,ARC_Config::app_url()); // Feed only: private CPT has no public permalink.
                 $kind='Příspěvek';
             }else{
                 if($post->post_type!=='post' || $post->post_status!=='publish' || $post->post_password!=='')continue;
