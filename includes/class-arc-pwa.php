@@ -29,11 +29,11 @@ final class ARC_PWA {
     public static function endpoint(): void {
         if(!self::on_live() || !isset($_GET['arc_pwa']))return;
         $kind=sanitize_key((string)wp_unslash($_GET['arc_pwa']));
-        $app=ARC_Config::app_url();$scope=trailingslashit((string)wp_parse_url($app,PHP_URL_PATH));$icon=ARC_URL.'assets/pwa-icon-192.png';$large=ARC_URL.'assets/pwa-icon-512.png';
+        $app=ARC_Config::app_url();$scope=trailingslashit((string)wp_parse_url($app,PHP_URL_PATH));$icon=ARC_Config::icon_url(192);$large=ARC_Config::icon_url(512);
         nocache_headers();header('X-Content-Type-Options: nosniff');
         if($kind==='manifest') {
             header('Content-Type: application/manifest+json; charset=UTF-8');
-            echo wp_json_encode(['id'=>$app,'name'=>ARC_Config::name(),'short_name'=>ARC_Config::short_name(),'description'=>ARC_Config::description(),'lang'=>'cs','start_url'=>$app,'scope'=>$scope,'display'=>'standalone','theme_color'=>'#343434','background_color'=>'#FFFFFF','icons'=>[
+            echo wp_json_encode(['id'=>$app,'name'=>ARC_Config::name(),'short_name'=>ARC_Config::short_name(),'description'=>ARC_Config::description(),'lang'=>'cs','start_url'=>$app,'scope'=>ARC_Config::legacy_site()?home_url('/'):$scope,'display'=>'standalone','theme_color'=>ARC_Config::color('theme_color'),'background_color'=>ARC_Config::color('background_color'),'icons'=>[
               ['src'=>$icon,'sizes'=>'192x192','type'=>'image/png','purpose'=>'any'],
               ['src'=>$large,'sizes'=>'512x512','type'=>'image/png','purpose'=>'any']],
               'shortcuts'=>array_merge([['name'=>'Přátelé','url'=>ARC_Navigation::app_link('pratele')]], ARC_Config::enabled('show_premium') ? [['name'=>'Premium','url'=>home_url('/premium/')]] : [])],JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE);exit;
@@ -56,8 +56,8 @@ final class ARC_PWA {
     public static function head(): void {
         if(!self::on_live())return;
         echo '<link rel="manifest" href="'.esc_url(add_query_arg('arc_pwa','manifest',ARC_Config::app_url())).'">';
-        echo '<meta name="theme-color" content="#343434"><meta name="application-name" content="'.esc_attr(ARC_Config::name()).'">';
-        echo '<link rel="apple-touch-icon" href="'.esc_url(ARC_URL.'assets/pwa-icon-192.png').'">';
+        echo '<meta name="theme-color" content="'.esc_attr(ARC_Config::color('theme_color')).'"><meta name="application-name" content="'.esc_attr(ARC_Config::name()).'">';
+        echo '<link rel="apple-touch-icon" href="'.esc_url(ARC_Config::icon_url(192)).'">';
     }
     public static function register_worker(): void {
         if(!self::on_live())return;
