@@ -84,7 +84,7 @@ final class ARC_Install {
             $html .= '<div class="arc-install-guide-inner"><button type="button" class="arc-install-close" data-arc-install-close aria-label="Zavřít">×</button>';
             $html .= '<h3 id="arc-install-guide-title">Instalace '.esc_html(ARC_Config::name()).'</h3>';
             $html .= '<p data-arc-install-instructions>Aplikaci lze přidat přímo z nabídky prohlížeče.</p>';
-            $html .= '<a class="arc-install-open" href="'.esc_url(ARC_Config::app_url()).'">Otevřít '.esc_html(ARC_Config::name())</a>';
+            $html .= '<a class="arc-install-open" href="'.esc_url(ARC_Config::app_url()).'">Otevřít '.esc_html(ARC_Config::name()).'</a>';
             $html .= '</div></dialog>';
         }
         return $html;
