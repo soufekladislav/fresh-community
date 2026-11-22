@@ -172,11 +172,11 @@ final class ARC_API {
             $previous=absint(get_post_meta($p->ID,'_arc_kit_wall_post',true));
             $existing=$previous?get_post($previous):null;
             if($existing instanceof WP_Post && $existing->post_type===ARC_Wall::TYPE && (int)$existing->post_author===$uid && ARC_Wall::can_read($existing,0))
-                return ['ok'=>true,'url'=>add_query_arg('arc_post',$previous,home_url('/app/')),'post_id'=>$previous];
+                return ['ok'=>true,'url'=>add_query_arg('arc_post',$previous,ARC_Config::app_url()),'post_id'=>$previous];
             $post=ARC_Wall::share($uid,'kit',$p->ID,0,'Sdílím balíček výbavy: '.$p->post_title);
             if(is_wp_error($post))return $post;
             $newId=(int)$post['id'];update_post_meta($p->ID,'_arc_kit_wall_post',$newId);
-            return ['ok'=>true,'url'=>add_query_arg('arc_post',$newId,home_url('/app/')),'post_id'=>$newId];
+            return ['ok'=>true,'url'=>add_query_arg('arc_post',$newId,ARC_Config::app_url()),'post_id'=>$newId];
         }
         if($mode!=='friends')return self::fail('arc_kit_share','Neznámý způsob sdílení.');
         $raw=$r->get_param('target_ids');
@@ -273,7 +273,7 @@ final class ARC_API {
         if(!$text) return self::fail('arc_message','Napiš dotaz.');
         set_transient($key,$count+1,10*MINUTE_IN_SECONDS);
         try { $result=call_user_func($provider,['message'=>$text,'user_id'=>get_current_user_id()]); }
-        catch(Throwable $e) { error_log('AR Community advisor failure: '.$e->getMessage());return self::fail('arc_provider','Poradce nyní není dostupný.',502); }
+        catch(Throwable $e) { error_log('Fresh Community advisor failure: '.$e->getMessage());return self::fail('arc_provider','Poradce nyní není dostupný.',502); }
         if(is_wp_error($result)) return $result;
         if(!is_array($result)) return self::fail('arc_provider','Neplatná odpověď poradce.',502);
         return new WP_REST_Response($result,200);
