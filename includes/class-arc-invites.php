@@ -65,7 +65,7 @@ final class ARC_Invites {
     }
     public static function on_register(int $uid): void {
         $token=self::token();$inviter=self::inviter($token);
-        if(!$inviter || $inviter===$uid || !get_userdata($inviter))return;
+        if(!self::has_valid_cookie() || !$inviter || $inviter===$uid || !get_userdata($inviter))return;
         // Explicit invitation link: create the connection only for the newly-created account.
         global $wpdb;$table=ARC_Relations::table();
         $result=$wpdb->query($wpdb->prepare("INSERT INTO $table (user_id,target_id,kind,status,created_at) VALUES (%d,%d,'connection','accepted',%s) ON DUPLICATE KEY UPDATE status='accepted'",$inviter,$uid,current_time('mysql',true)));
@@ -91,7 +91,7 @@ final class ARC_Invites {
     /** An invited existing member must confirm after clicking the link. */
     public static function accept_link(int $uid,string $token): array|WP_Error {
         $inviter=self::inviter_for_token($token);
-        if(!$inviter || $inviter===$uid || !get_userdata($inviter) || !get_userdata($uid))return new WP_Error('arc_invite_expired','Pozvánka vypršela nebo je neplatná.',['status'=>400]);
+        if(!$inviter || !ARC_Access::member($inviter) || $inviter===$uid || !get_userdata($inviter) || !get_userdata($uid))return new WP_Error('arc_invite_expired','Pozvánka vypršela nebo je neplatná.',['status'=>400]);
         if(!ARC_Relations::connected($inviter,$uid)){
             $request=ARC_Relations::invite_known_email($inviter,$uid);
             if(is_wp_error($request))return $request;
