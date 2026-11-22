@@ -135,7 +135,7 @@ final class ARC_Profile {
     /** Business status is an admin-reviewed presentation flag, not an affiliate attribution role. */
     public static function admin_fields(WP_User $u): void {
         if(!current_user_can('edit_user',$u->ID))return;
-        echo '<h2>Adrenaline Live – profesionální profil</h2><table class="form-table"><tr><th><label for="arc_business_status">Obchodní partner</label></th><td>';
+        echo '<h2>Fresh Community – profesionální profil</h2><table class="form-table"><tr><th><label for="arc_business_status">Obchodní partner</label></th><td>';
         wp_nonce_field('arc_business_admin_'.$u->ID,'arc_business_nonce');
         echo '<label><input id="arc_business_status" name="arc_business_status" type="checkbox" value="1" '.checked((string)get_user_meta($u->ID,self::META_KIND,true),'business',false).'> Ověřený obchodní partner</label><p class="description">Toto není změna Fresh Affiliate přiřazení. Veřejný profil zapni teprve po výslovné dohodě s partnerem.</p>';
         echo '<label><input name="arc_business_public_consent" type="checkbox" value="1"> Partner souhlasí se zveřejněním profesionálního profilu</label></td></tr></table>';
