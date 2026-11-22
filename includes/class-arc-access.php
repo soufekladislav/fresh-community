@@ -6,7 +6,6 @@ final class ARC_Access {
     public static function boot(): void {
         add_filter('registration_errors',[self::class,'wp_registration_errors'],10,3);
         add_filter('woocommerce_registration_errors',[self::class,'woo_registration_errors'],10,4);
-        add_action('user_register',[self::class,'register_member'],80);
         add_filter('rest_pre_dispatch',[self::class,'rest_gate'],10,3);
         add_action('show_user_profile',[self::class,'admin_field']);
         add_action('edit_user_profile',[self::class,'admin_field']);
@@ -35,10 +34,6 @@ final class ARC_Access {
         if(function_exists('is_checkout') && is_checkout())return $errors;
         if(!self::can_register())$errors->add('arc_invite_required','Pro vstup do komunity potřebuješ platnou pozvánku.');
         return $errors;
-    }
-    public static function register_member(int $uid): void {
-        if(self::invite_only() && ARC_Invites::has_valid_cookie())
-            update_user_meta($uid,self::APPROVED,'1');
     }
     public static function rest_gate($result,WP_REST_Server $server,WP_REST_Request $request) {
         if(!self::invite_only() || is_wp_error($result))return $result;
