@@ -53,7 +53,7 @@ final class ARC_Relations {
     /** Explicit invitation by known email. Does not expose existence in the UI. */
     public static function invite_known_email(int $uid,int $target): array|WP_Error {
         if($uid<1 || $target<1 || $uid===$target || !get_userdata($target)) return new WP_Error('arc_relation','Neplatná žádost.',['status'=>400]);
-        if(ARC_Profile::visibility($uid)==='private')return new WP_Error('arc_private','Pro pozvání nastav profil na Viditelný v síti nebo Veřejný.',['status'=>403]);
+        if(ARC_Profile::visibility($uid)==='private' && !user_can($uid,'manage_options'))return new WP_Error('arc_private','Pro pozvání nastav profil na Viditelný v síti nebo Veřejný.',['status'=>403]);
         if(self::connected($uid,$target)) return ['ok'=>true,'connected'=>true];
         global $wpdb;$t=self::table();
         $reverse=$wpdb->get_var($wpdb->prepare("SELECT id FROM $t WHERE user_id=%d AND target_id=%d AND kind='connection' LIMIT 1",$target,$uid));
