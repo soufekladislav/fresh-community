@@ -42,6 +42,7 @@ final class ARC_Shortcodes {
             'root'=>esc_url_raw(rest_url('ar-community/v1/')),'nonce'=>wp_create_nonce('wp_rest'),
             'loggedIn'=>is_user_logged_in(),'loginUrl'=>function_exists('wc_get_page_permalink')?wc_get_page_permalink('myaccount'):wp_login_url(),
             'cartUrl'=>function_exists('wc_get_cart_url')?wc_get_cart_url():'',
+            'name'=>ARC_Config::name(),
         ]);
     }
     private static function card_product(int $id, int $affiliate_owner=0): string {
@@ -273,7 +274,7 @@ final class ARC_Shortcodes {
             if($experience!=='') $html.='<div>'.wpautop(esc_html($experience)).'</div>';
             $html.='</section>';
         }
-        if($owner)$html.='<p><a class="arc-account-link" href="'.esc_url(function_exists('wc_get_account_endpoint_url')?wc_get_account_endpoint_url('ar-community'):home_url('/muj-ucet/')).'">Upravit můj profil</a></p>';
+        if($owner)$html.='<p><a class="arc-account-link" href="'.esc_url(function_exists('wc_get_account_endpoint_url')?wc_get_account_endpoint_url('ar-community'):ARC_Config::app_url())).'">Upravit můj profil</a></p>';
         if($owner){
         $html.='</div><aside class="arc-profile-social"><h2>Přátelé</h2><p class="arc-profile-vis"><strong>Viditelnost profilu:</strong> '.esc_html(['private'=>'Soukromý – pouze já','network'=>'Jen potvrzení přátelé','public'=>'Veřejný – všichni'][ARC_Profile::visibility($id)]??'Soukromý').'</p>';
         $allFriends=ARC_Relations::connected_ids($id);
