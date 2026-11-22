@@ -11,6 +11,7 @@ final class AR_Community {
     public static function deactivate(): void { flush_rewrite_rules(false); }
     public static function boot(): void {
         ARC_Google::boot();
+        ARC_Access::boot();
         ARC_Account::boot();
         add_action('template_redirect',[ARC_Invites::class,'capture'],2);
         add_action('woocommerce_before_customer_login_form',[ARC_Invites::class,'notice'],5);
@@ -155,6 +156,7 @@ final class AR_Community {
             UNIQUE KEY recipient_event (user_id,event_key),
             KEY inbox (user_id,is_read,created_at)
         ) $charset;");
+        ARC_Messages::install_table();
         update_option('arc_db_version',ARC_VERSION,false);
     }
     public static function woo_endpoint(): void { add_rewrite_endpoint('ar-community', EP_ROOT | EP_PAGES); }
