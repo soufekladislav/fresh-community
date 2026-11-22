@@ -36,7 +36,7 @@ final class ARC_PWA {
             echo wp_json_encode(['id'=>$app,'name'=>ARC_Config::name(),'short_name'=>ARC_Config::short_name(),'description'=>ARC_Config::description(),'lang'=>'cs','start_url'=>$app,'scope'=>$scope,'display'=>'standalone','theme_color'=>'#343434','background_color'=>'#FFFFFF','icons'=>[
               ['src'=>$icon,'sizes'=>'192x192','type'=>'image/png','purpose'=>'any'],
               ['src'=>$large,'sizes'=>'512x512','type'=>'image/png','purpose'=>'any']],
-              'shortcuts'=>[['name'=>'Přátelé','url'=>ARC_Navigation::app_link('pratele')],['name'=>'Premium','url'=>home_url('/premium/')]]],JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE);exit;
+              'shortcuts'=>array_merge([['name'=>'Přátelé','url'=>ARC_Navigation::app_link('pratele')]], ARC_Config::enabled('show_premium') ? [['name'=>'Premium','url'=>home_url('/premium/')]] : [])],JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE);exit;
         }
         if($kind==='sw') {
             header('Content-Type: text/javascript; charset=UTF-8');header('Service-Worker-Allowed: '.$scope);
