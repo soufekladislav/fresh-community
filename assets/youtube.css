@@ -1,0 +1,11 @@
+/* Fresh Community private YouTube submissions – isolated from the post composer */
+.arc-youtube-upload-panel[hidden] { display:none!important; }
+.arc-youtube-upload-panel { margin-top:16px; padding:16px; border:1px solid #d8dfe4; border-radius:16px; background:#fff; }
+.arc-yt-form { display:grid; gap:12px; }
+.arc-yt-form label { display:flex; flex-direction:column; gap:5px; font-weight:600; }
+.arc-yt-form input[type=text], .arc-yt-form textarea { width:100%; max-width:100%; box-sizing:border-box; border:1px solid #ccd1d5; border-radius:10px; padding:10px; }
+.arc-yt-form input[type=file] { width:100%; max-width:100%; }
+.arc-yt-form .arc-yt-consent { display:flex; flex-direction:row; align-items:flex-start; font-weight:400; font-size:.9em; line-height:1.45; }
+.arc-yt-form .arc-yt-consent input { margin-top:4px; }
+.arc-yt-form-box p { margin:0 0 12px; }
+.arc-yt-status { background:#f0f7da; border:1px solid #a0c527; border-radius:9px; padding:10px; }

@@ -1,0 +1,19 @@
+/* Isolated to the installer shortcode; does not modify community or Woo layouts. */
+.arc-install-widget{font-family:Poppins,system-ui,sans-serif;display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;max-width:900px;margin:14px auto;padding:18px 22px;border-radius:20px;background:linear-gradient(115deg,#28302b,#343434);box-shadow:0 13px 34px rgba(0,0,0,.14);color:#fff}
+.arc-install-description{flex:1 1 220px;font-size:15px;line-height:1.5;font-weight:500;color:#f4f6ef}
+.arc-install-button{appearance:none;cursor:pointer;border:0;border-radius:999px;padding:15px 24px;display:inline-flex;justify-content:center;align-items:center;gap:10px;background:#9EC415;color:#18200a;font:700 16px/1.2 Poppins,system-ui,sans-serif;box-shadow:0 6px 0 #75950c;transition:transform .16s ease,box-shadow .16s ease}
+.arc-install-button:hover{background:#b6db30;transform:translateY(-2px);box-shadow:0 8px 0 #75950c}
+.arc-install-button:focus-visible,.arc-install-close:focus-visible,.arc-install-open:focus-visible{outline:3px solid #E40058;outline-offset:3px}
+.arc-install-button:active{transform:translateY(3px);box-shadow:0 2px 0 #75950c}
+.arc-install-button-icon{width:24px;height:24px;background:#26300f;color:#fff;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:19px}
+.arc-install-status{flex-basis:100%;font-size:12px;line-height:1.45;color:#dae7c3;min-height:1em}
+.arc-install-status:empty{display:none}
+.arc-install-guide{color:#292d2a;border:0;border-radius:22px;padding:0;width:min(92vw,480px);max-height:85vh;box-shadow:0 18px 90px rgba(0,0,0,.35);font-family:Poppins,system-ui,sans-serif}
+.arc-install-guide::backdrop{background:rgba(18,23,19,.65)}
+.arc-install-guide-inner{position:relative;padding:32px 26px 26px}
+.arc-install-guide h3{font-size:23px;font-weight:800;line-height:1.25;margin:0 34px 12px 0}
+.arc-install-guide p{font-size:15px;line-height:1.65;margin:0 0 25px}
+.arc-install-close{position:absolute;right:13px;top:11px;background:transparent;border:0;font-size:30px;cursor:pointer;line-height:1;color:#333}
+.arc-install-open{display:inline-block;padding:12px 19px;border-radius:999px;background:#9EC415;color:#172000!important;font-weight:700;text-decoration:none!important}
+@media(max-width:600px){.arc-install-widget{padding:19px 16px;gap:15px}.arc-install-button{width:100%;font-size:15px}.arc-install-description{font-size:14px;flex-basis:100%}}
+@media(prefers-reduced-motion:reduce){.arc-install-button{transition:none}}

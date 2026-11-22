@@ -1,0 +1,171 @@
+.arc-wrap{--arc-accent:#9ec415;--arc-ink:#14212e;--arc-soft:#f7f9f5;--arc-line:#dfe6dd;color:var(--arc-ink);max-width:1140px;margin:18px auto;font-family:inherit}
+.arc-wrap h2{margin:0 0 18px}.arc-wrap h3{margin:0 0 13px;font-size:1.18em}
+.arc-columns,.arc-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin:15px 0}
+.arc-grid{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.arc-panel{padding:21px;background:#fff;border:1px solid var(--arc-line);border-radius:14px;box-shadow:0 3px 13px #0011}
+.arc-panel label{display:block;margin:12px 0;font-size:.95em;font-weight:600}
+.arc-panel input[type=text],.arc-panel input:not([type]),.arc-panel textarea{display:block;width:100%;box-sizing:border-box;border:1px solid #cbd5c7;border-radius:9px;padding:10px 12px;margin-top:5px;background:#fff;font:inherit;color:inherit}
+.arc-panel input[type=checkbox]{accent-color:var(--arc-accent)}
+.arc-panel .arc-inline,.arc-inline{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.arc-inline input:not([type=checkbox]){width:auto;flex:1;min-width:150px}
+.arc-btn,.arc-fav{padding:10px 14px;border:0;border-radius:9px;background:var(--arc-accent);color:#17220d;font:inherit;font-size:.9em;font-weight:700;cursor:pointer}
+.arc-btn:hover,.arc-fav:hover{filter:brightness(.96)}.arc-btn-subtle{background:#edf2e5}.arc-btn:disabled{opacity:.45;cursor:default}
+.arc-listrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--arc-line)}
+.arc-listrow:last-child{border-bottom:0}.arc-listrow>div:first-child{flex:1;min-width:175px}.arc-listrow small{display:block;color:#57646c;margin-top:3px;font-size:.8em}
+.arc-product{padding:10px 0;border-bottom:1px solid var(--arc-line);display:flex;gap:12px;justify-content:space-between}
+.arc-product .arc-price{color:#506226;white-space:nowrap}.arc-products{padding-left:20px}
+.arc-small{font-size:.85em;color:#66716a;line-height:1.5}.arc-error{color:#b0003e}.arc-status{margin-top:15px;min-height:1.5em}
+.arc-fav[aria-pressed=true]{background:#ffeaf1;color:#a50045}
+@media(max-width:680px){.arc-columns{grid-template-columns:1fr}.arc-panel{padding:15px}.arc-inline input:not([type=checkbox]){flex-basis:100%}}
+
+/* Profile-first account layout, AR brand, adaptive masonry (columns). */
+.arc-account{--arc-accent:#A0C527;--arc-pink:#E5175D;--arc-ink:#343434;--arc-line:#DBDBDB;max-width:none;margin:0;font-family:Poppins,sans-serif}
+.arc-account>h2{margin-bottom:4px}.arc-account-intro{color:#6E6E6E;font-size:14px}
+.arc-masonry{columns:2 350px;column-gap:18px;margin-top:18px}
+.arc-masonry>.arc-panel{display:inline-block;vertical-align:top;width:100%;break-inside:avoid;margin:0 0 18px;box-shadow:none;border:1px solid #e1e1e1;border-radius:15px;padding:20px}
+.arc-masonry h3{margin:0 0 14px;font-size:19px;color:#343434}
+.arc-masonry h4{font-size:15px;margin:20px 0 7px;color:#343434}
+.arc-avatar-tools{display:flex;align-items:flex-start;gap:17px;flex-wrap:wrap}
+.arc-avatar-preview{width:92px;height:92px;display:flex;align-items:center;justify-content:center;border:1px dashed #bec5b4;border-radius:50%;font-size:29px;color:#879676;overflow:hidden;background:#f5f8ed;flex-shrink:0}
+.arc-avatar-preview img{width:100%;height:100%;object-fit:cover;display:block}
+.arc-avatar-tools form{flex:1 1 230px}
+.arc-avatar-tools form label{margin:0 0 8px;font-size:12px}
+.arc-avatar-tools input[type=file]{width:100%;font-size:12px;margin-bottom:5px}
+.arc-avatar-tools label.arc-photo-consent{display:flex;align-items:flex-start;gap:7px;line-height:1.5;font-size:11px;font-weight:400}
+.arc-avatar-tools label.arc-photo-consent input{flex:0 0 auto;margin:2px 0 0}
+.arc-account .arc-panel select{width:100%;border:1px solid #cbd5c7;border-radius:9px;padding:11px;font:inherit;color:inherit;background:#fff}
+.arc-account .arc-btn{background:#E5175D;color:#fff;border-radius:20px;font-weight:700;font-size:12px;text-decoration:none!important;padding:11px 13px}
+.arc-account .arc-btn-subtle{background:#f6f6f6;color:#343434;border:1px solid #dedede}
+.arc-account .arc-inline .arc-account-link{font-size:12px;white-space:normal}
+.arc-account .arc-inline a.arc-btn{color:#343434!important}
+.arc-friends-panel form input[name=query]{min-width:125px;max-width:100%;width:100%;flex:1 1 130px}
+.arc-personline{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid #eee;flex-wrap:wrap}
+.arc-personline button{font-size:11px;min-height:32px}
+.arc-personline:last-child{border-bottom:0}
+.arc-premium-panel{background:#343434!important;color:white!important;border-color:#343434!important}
+.arc-premium-panel h3{color:#A0C527!important;font-size:24px!important;line-height:1.25}
+.arc-premium-panel p{color:#fff!important}
+.arc-premium-panel .arc-small{color:#d3d3d3!important}
+.arc-premium-eyebrow{color:#A0C527;font-size:11px;font-weight:800;letter-spacing:.13em;margin-bottom:12px}
+.arc-premium-pill{display:inline-block;border:1px solid #A0C527;border-radius:20px;color:#A0C527;padding:9px 15px;font-size:12px;font-weight:700}
+.arc-editor-panel{margin-top:16px!important;box-shadow:none}
+.arc-public-avatar{object-fit:cover;border-radius:50%;display:block;margin-bottom:18px}
+.arc-account input:focus-visible,.arc-account textarea:focus-visible,.arc-account select:focus-visible{outline:2px solid #A0C527;outline-offset:2px}
+@media(max-width:780px){.arc-masonry{columns:1}.arc-masonry>.arc-panel{padding:16px}.arc-avatar-tools{gap:12px}}
+
+/* Profile beta.4 – lightweight author editor, search suggestions and public profile cards. */
+.arc-bio-toolbar{display:flex;gap:6px;margin:3px 0 0}
+.arc-bio-toolbar button{border:1px solid #ddd;border-bottom:0;padding:5px 12px;background:#f7f7f7;color:#343434;border-radius:7px 7px 0 0;font:600 12px Poppins,sans-serif;cursor:pointer}
+.arc-bio-editor{min-height:115px;background:#fff;border:1px solid #ccd2cc;border-radius:0 9px 9px 9px;padding:12px;line-height:1.65;overflow-wrap:anywhere}
+.arc-bio-editor:focus{outline:2px solid #A0C527;outline-offset:1px}
+.arc-bio-editor a,.arc-public-bio a{color:#E5175D;text-decoration:underline}
+.arc-friend-search label,.arc-friend-email label{display:block;font-size:13px;font-weight:650;margin-bottom:6px}
+.arc-friend-input-row{display:flex;gap:8px;align-items:center}.arc-friend-input-row input{flex:1;min-width:120px}
+.arc-friend-email{display:flex;align-items:end;gap:8px;margin-top:14px;flex-wrap:wrap}.arc-friend-email label{flex:1 1 210px}.arc-friend-email input{width:100%}
+.arc-suggestions{margin-top:4px;border:1px solid #e3e7e3;border-radius:12px;background:#fff;overflow:hidden;max-height:300px;overflow-y:auto}
+.arc-suggestions:empty{border:0}.arc-suggestion{display:flex;align-items:center;gap:9px;padding:10px;border-bottom:1px solid #eee}
+.arc-suggestion:last-child{border-bottom:0}.arc-suggestion img,.arc-suggestion-placeholder,.arc-friend-avatar{width:38px;height:38px;min-width:38px;object-fit:cover;border-radius:50%;background:#f2f5e8;display:inline-flex;align-items:center;justify-content:center}
+.arc-suggestion a{flex:1;min-width:0;font-weight:700;text-decoration:none;color:#343434;overflow-wrap:anywhere}
+.arc-suggestion small{font-size:11px}.arc-suggestion button{font-size:11px!important;padding:8px!important;white-space:nowrap}
+.arc-personline a{display:inline-flex;align-items:center;gap:7px}
+.arc-friends-page{max-width:1000px;margin:0 auto}.arc-friends-page .arc-friends-panel{padding:22px}
+.arc-public-profile{max-width:1200px;margin:0 auto}.arc-public-hero{display:flex;gap:25px;align-items:center;padding:28px;border:1px solid #e5e5e5;border-radius:24px;background:#fff}
+.arc-profile-avatar{width:132px;height:132px;min-width:132px;display:flex;align-items:center;justify-content:center;border-radius:50%;object-fit:cover;border:4px solid #A0C527;background:#f4f7e9}
+.arc-profile-avatar-blank{font-size:45px;font-weight:800;color:#343434}
+.arc-public-hero-text{flex:1;min-width:0}.arc-public-hero h1{font-size:30px;line-height:1.15;margin:0 0 10px}
+.arc-public-bio{font-size:15px;line-height:1.65;overflow-wrap:anywhere}.arc-public-bio p{margin:0 0 7px}
+.arc-profile-section{margin-top:25px}.arc-profile-section h2{font-size:24px;margin-bottom:13px}
+.arc-profile-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}
+.arc-profile-tile{background:#fff;overflow:hidden;border:1px solid #e3e7e3;border-radius:17px;box-shadow:0 5px 14px rgba(0,0,0,.035)}
+.arc-profile-tile>img,.arc-profile-tile>a>img{width:100%;aspect-ratio:16/10;display:block;object-fit:cover}
+.arc-profile-tile-content{padding:15px}.arc-tile-type{display:block;color:#758f25;font-weight:800;font-size:10px;letter-spacing:.10em;margin-bottom:7px}
+.arc-profile-tile-content h3{font-size:16px;margin:0 0 7px;line-height:1.4}.arc-profile-tile-content h3 a{color:#343434;text-decoration:none}.arc-profile-tile-content p{color:#53605c;font-size:13px;line-height:1.6;margin:0 0 10px;overflow-wrap:anywhere}
+.arc-profile-tile-content time{display:block;color:#777;font-size:11px;margin-top:12px}
+@media(max-width:850px){.arc-profile-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.arc-public-hero{gap:13px;padding:18px;align-items:flex-start}.arc-profile-avatar{width:86px;height:86px;min-width:86px}.arc-public-hero h1{font-size:22px}.arc-profile-grid{grid-template-columns:1fr}}
+
+.arc-bio-fallback[hidden]{display:none!important}
+/* v0.2.0-beta.5: user card, interests, friends and activity alerts */
+.arc-public-profile .arc-public-hero{display:grid;grid-template-columns:185px minmax(0,1fr) minmax(210px,.43fr);align-items:start;gap:28px;padding:28px;border-radius:22px}
+.arc-public-profile .arc-profile-avatar{width:180px;height:180px;min-width:180px;border-radius:50%!important;object-fit:cover!important;aspect-ratio:1!important;border:5px solid #A0C527;background:#f6f9ed;box-shadow:0 5px 25px rgba(0,0,0,.10)}
+.arc-public-profile .arc-public-hero-text{min-width:0}
+.arc-public-profile .arc-public-hero h1{font:800 30px/1.25 Poppins,sans-serif!important}
+.arc-profile-interests{margin:16px 0}.arc-profile-interests>strong{font-size:13px;display:block;margin-bottom:8px;color:#343434}
+.arc-interest-tags{display:flex;gap:6px;flex-wrap:wrap}
+.arc-interest-tags span{display:inline-flex;padding:6px 12px;background:#F3F8E7;border:1px solid #DAE6BB;border-radius:999px;font:700 12px/1.3 Poppins,sans-serif;color:#536811}
+.arc-profile-social{border-left:1px solid #E6E6E6;padding-left:22px;min-width:0}.arc-profile-social h2{font:800 19px/1.4 Poppins,sans-serif!important;margin:0 0 12px!important}.arc-profile-social h3{font:750 12px/1.4 Poppins,sans-serif!important;margin:12px 0 7px!important}
+.arc-friend-chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:9px}.arc-friend-chip{display:inline-flex;align-items:center;gap:7px;text-decoration:none!important;color:#343434!important;background:#F7F7F7;border:1px solid #E7E7E7;padding:4px 8px 4px 4px;border-radius:22px;font-size:11px;font-weight:650;max-width:100%;overflow-wrap:anywhere}.arc-friend-chip img,.arc-friend-chip>span:first-child:not(:last-child){width:30px;height:30px;flex-shrink:0;border-radius:50%;object-fit:cover;background:#A0C527;display:flex;align-items:center;justify-content:center}
+.arc-profile-share{margin-top:16px;padding:16px;border:1px solid #E2E8D5;background:#FAFCF6;border-radius:14px;display:grid;gap:8px}.arc-profile-share label{font-weight:700}.arc-profile-share .arc-share-row{display:flex;gap:8px}.arc-profile-share input{min-width:0;width:100%;flex:1;font-size:12px}.arc-profile-share small{font-size:12px;color:#637058}.arc-profile-share a{font-size:13px}
+.arc-inline-status{font:750 13px/1.5 Poppins,sans-serif;color:#55770A;margin:8px 0;min-height:0}.arc-inline-status:empty{display:none}
+.arc-notifications{margin:16px 0 22px!important;padding:19px 22px!important;background:#FFF!important;border:1px solid #DDE8C8!important;border-left:4px solid #A0C527!important;border-radius:15px!important;box-shadow:0 7px 25px rgba(0,0,0,.035)}
+.arc-notifications-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px}.arc-notifications-head h3{margin:0!important;font:800 19px/1.4 Poppins,sans-serif!important}.arc-notification-badge{background:#E5175D;color:#fff;padding:3px 8px;border-radius:99px;font-size:11px}.arc-notifications-list{max-height:170px;overflow-y:auto;scrollbar-width:thin;margin:12px 0 5px}
+.arc-notification{display:flex;align-items:flex-start;gap:12px;padding:10px 8px;border-bottom:1px solid #EEF0EB}.arc-notification:last-child{border-bottom:0}.arc-notification-dot{width:8px;height:8px;flex:0 0 8px;border-radius:50%;margin-top:6px;background:transparent}.arc-notification.is-unread .arc-notification-dot{background:#E5175D}.arc-notification a{color:#343434!important;font:650 13px/1.5 Poppins,sans-serif!important;text-decoration:none!important}.arc-notification a:hover{color:#E5175D!important}.arc-notification time{display:block;color:#777;font-size:11px;margin-top:3px}
+@media(max-width:1100px){.arc-public-profile .arc-public-hero{grid-template-columns:155px minmax(0,1fr)}.arc-public-profile .arc-profile-avatar{height:150px;width:150px;min-width:150px}.arc-public-profile .arc-profile-social{grid-column:1 / -1;border-left:0;border-top:1px solid #E6E6E6;padding:15px 0 0}}
+@media(max-width:600px){.arc-public-profile .arc-public-hero{grid-template-columns:95px minmax(0,1fr);gap:13px;padding:16px}.arc-public-profile .arc-profile-avatar{height:92px;width:92px;min-width:92px;border-width:3px}.arc-public-profile .arc-public-hero h1{font-size:23px!important}.arc-profile-share .arc-share-row{flex-wrap:wrap}.arc-notifications{padding:14px!important}}
+
+/* Keep typography consistent with Adrenaline Race, including Elementor pages. */
+.arc-wrap,.arc-wrap h1,.arc-wrap h2,.arc-wrap h3,.arc-wrap h4,.arc-wrap input,.arc-wrap select,.arc-wrap button{font-family:Poppins,sans-serif!important}
+.arc-friends-page>h2,.arc-public-profile .arc-profile-section h2{font-weight:800!important;letter-spacing:-.025em}
+
+.arc-optin-label{display:flex!important;align-items:flex-start;gap:10px;font-size:13px}.arc-optin-label input{width:auto!important;margin-top:5px}
+
+/* beta9.7 account dashboard: predictable two-column stacks, responsive ordering */
+.arc-account .arc-masonry{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:18px;columns:auto;align-items:start}
+.arc-account .arc-account-column{display:flex;flex-direction:column;gap:18px;min-width:0}
+.arc-account .arc-account-column>.arc-panel{width:100%;min-width:0;display:block;margin:0;break-inside:auto;box-sizing:border-box;padding:20px;border:1px solid #E1E1E1;border-radius:16px;box-shadow:none;background:#fff}
+.arc-account .arc-account-column>.arc-premium-panel{background:#343434!important}
+.arc-account .arc-premium-panel h3 span{font-weight:600;text-transform:none}
+.arc-avatar-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:7px}
+.arc-avatar-file-input{position:absolute!important;width:1px!important;height:1px!important;opacity:0!important;clip-path:inset(50%);pointer-events:none}
+.arc-account .arc-avatar-tools form{min-width:0}
+.arc-account .arc-avatar-tools .arc-btn{white-space:normal;padding:9px 12px}
+.arc-account-friend-tabs{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 15px}
+.arc-account .arc-account-friend-tabs>button{font:650 11px/1.35 Poppins,sans-serif!important;letter-spacing:normal!important;text-transform:none!important;min-height:34px!important;padding:7px 11px!important;border-radius:999px!important;border:1px solid #DBDBDB!important;background:#fff!important;color:#343434!important;box-shadow:none!important;cursor:pointer}
+.arc-account .arc-account-friend-tabs>button.is-active{border-color:#A0C527!important;background:#F3F8E7!important;color:#343434!important}
+.arc-account .arc-account-friend-tabs>button:hover{background:#f5f5f5!important}
+.arc-account-friend-view[hidden]{display:none!important}
+.arc-account-invite-actions{display:flex;gap:7px;flex-wrap:wrap}
+.arc-account-friend-view .arc-friend-search{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:8px}
+.arc-account-friend-view .arc-friend-search label{min-width:0;margin:0}
+.arc-account-friend-view .arc-friend-search [data-arc-friend-results]{grid-column:1/-1}
+.arc-account-friend-view .arc-friend-email{display:flex;gap:8px;align-items:end}
+@media(max-width:900px){
+ .arc-account .arc-masonry{display:flex;flex-direction:column;gap:14px}
+ .arc-account .arc-account-column{display:contents}
+ .arc-account .arc-profile-panel{order:1}
+ .arc-account .arc-friends-panel{order:2}
+ .arc-account .arc-premium-panel{order:3}
+ .arc-account .arc-products-panel{order:4}
+ .arc-account .arc-saved-posts-panel{order:5}
+ .arc-account .arc-account-column>.arc-panel{padding:16px}
+}
+@media(max-width:480px){.arc-account-friend-view .arc-friend-search{grid-template-columns:1fr}.arc-account-friend-view .arc-friend-search [data-arc-friend-results]{grid-column:1}.arc-account .arc-avatar-tools{gap:12px}.arc-avatar-actions .arc-btn{font-size:11px!important}}
+
+
+.arc-account .arc-premium-panel h3{text-transform:none!important}
+
+/* beta 9.8 – compact account cards; keeps Elementor's global button styles isolated. */
+.arc-account .arc-friends-panel-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.arc-account .arc-friends-panel-heading h3{margin:0!important}
+.arc-account .arc-account-friends-simple>h4{margin:18px 0 10px!important;font:750 14px/1.4 Poppins,sans-serif!important}
+.arc-account .arc-account-friends-simple>h4 small{display:block;margin-top:3px;color:#6E6E6E;font-size:11px;font-weight:400}
+.arc-account .arc-account-friends-simple .arc-personline{display:flex;align-items:center;gap:8px;border-top:1px solid #eee;padding:10px 0}
+.arc-account .arc-account-friends-simple .arc-personline>a{display:inline-flex;align-items:center;gap:9px;min-width:0;overflow-wrap:anywhere}
+.arc-account .arc-account-friends-simple .arc-friend-avatar{width:40px;height:40px;border-radius:50%;object-fit:cover;flex:none}
+.arc-account .arc-account-friends-simple .arc-friend-placeholder{background:#343434;color:#A0C527;display:grid;place-items:center;font-size:12px}
+.arc-account .arc-friends-panel-heading .arc-account-link,.arc-account .arc-notifications-compact .arc-account-link{font:650 12px/1.5 Poppins,sans-serif!important;color:#E5175D!important;text-decoration:none!important;white-space:normal}
+.arc-account .arc-notifications-compact .arc-notifications-list{max-height:none;overflow:visible;margin:9px 0!important;color:#343434!important;font:500 14px/1.6 Poppins,sans-serif}
+.arc-account .arc-notifications-compact{padding:14px 18px!important;margin:0 0 18px!important}
+.arc-account .arc-notifications-compact .arc-notifications-head h3{font-size:17px!important}
+@media(max-width:620px){.arc-account .arc-friends-panel-heading{align-items:start}.arc-account .arc-account-friends-simple .arc-personline{padding:8px 0}}
+
+/* 10.0 - compact tappable avatar with native mobile picker */
+.arc-account button.arc-avatar-preview{cursor:pointer!important;padding:0!important;appearance:none;-webkit-appearance:none;border:2px dashed #A0C527!important;position:relative;box-shadow:none!important;max-width:92px!important;min-width:92px!important;height:92px!important}
+.arc-account button.arc-avatar-preview:focus-visible{outline:3px solid #E5175D!important;outline-offset:3px}
+.arc-account button.arc-avatar-preview:after{content:"✎";position:absolute;right:0;bottom:0;background:#343434;color:#A0C527;border-radius:50%;width:24px;height:24px;font:700 16px/24px Poppins,sans-serif}
+.arc-account .arc-photo-caption{display:block;font:500 12px/1.5 Poppins,sans-serif;color:#6E6E6E;margin:5px 0}
+.arc-account .arc-avatar-actions .arc-btn{font-size:11px!important;padding:7px 11px!important;min-height:0!important;border-radius:20px!important}
+
+/* beta10.1 – visibly show own profile privacy and public visibility controls. */
+.arc-public-visibility,.arc-profile-vis,.arc-side-visibility{font:600 12px/1.5 Poppins,Arial,sans-serif;color:#5b6152;margin:5px 0 12px}
+[data-arc-audience-help]{display:block;padding:5px 0 0;color:#666;font:400 12px/1.4 Poppins,Arial,sans-serif}
