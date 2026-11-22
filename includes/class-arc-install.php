@@ -1,9 +1,9 @@
 <?php
 defined('ABSPATH') || exit;
 /**
- * Non-invasive PWA installer for Adrenaline Live.
+ * Non-invasive PWA installer for the configured Fresh Community instance.
  * Does not alter user accounts, community records, WooCommerce, push subscriptions,
- * or the existing /app/ service worker registration and scope.
+ * or the existing service worker registration and scope.
  */
 final class ARC_Install {
     private static bool $printed = false;
@@ -42,7 +42,8 @@ final class ARC_Install {
     private static function enqueue(): void {
         wp_enqueue_script('arc-install-pwa');
         wp_add_inline_script('arc-install-pwa', 'window.ARCInstallConfig='.wp_json_encode([
-            'appUrl' => esc_url_raw(home_url('/app/')),
+            'appUrl' => esc_url_raw(ARC_Config::app_url()),
+            'name' => ARC_Config::name(),
             'version' => ARC_VERSION,
             'isApp' => class_exists('ARC_PWA') && ARC_PWA::on_live(),
             'deviceEndpoint' => is_user_logged_in() ? esc_url_raw(rest_url('ar-community/v1/pwa-device')) : '',
@@ -53,13 +54,13 @@ final class ARC_Install {
     public static function manifest_on_shortcode_page(): void {
         // /app/ already receives this manifest from ARC_PWA. Do not print a duplicate there.
         if (!self::has_installer_shortcode() || (class_exists('ARC_PWA') && ARC_PWA::on_live())) return;
-        echo '<link rel="manifest" href="'.esc_url(add_query_arg('arc_pwa', 'manifest', home_url('/app/'))).'">' . "\n";
+        echo '<link rel="manifest" href="'.esc_url(add_query_arg('arc_pwa', 'manifest', ARC_Config::app_url())).'">' . "\n";
     }
 
     public static function button($raw_atts = []): string {
         $atts = shortcode_atts([
             'text' => 'Instalovat aplikaci',
-            'popis' => 'Adrenaline Live vždy po ruce. Komunita přímo v mobilu i počítači.',
+            'popis' => ARC_Config::name().' vždy po ruce. Komunita přímo v mobilu i počítači.',
         ], (array)$raw_atts, 'ar_instalovat_aplikaci');
         if (!wp_style_is('arc-install-pwa', 'registered')) {
             wp_register_style('arc-install-pwa', ARC_URL.'assets/install-pwa.css', [], ARC_VERSION);
@@ -81,9 +82,9 @@ final class ARC_Install {
             self::$printed = true;
             $html .= '<dialog class="arc-install-guide" data-arc-install-guide aria-labelledby="arc-install-guide-title">';
             $html .= '<div class="arc-install-guide-inner"><button type="button" class="arc-install-close" data-arc-install-close aria-label="Zavřít">×</button>';
-            $html .= '<h3 id="arc-install-guide-title">Instalace Adrenaline Live</h3>';
+            $html .= '<h3 id="arc-install-guide-title">Instalace '.esc_html(ARC_Config::name()).'</h3>';
             $html .= '<p data-arc-install-instructions>Aplikaci lze přidat přímo z nabídky prohlížeče.</p>';
-            $html .= '<a class="arc-install-open" href="'.esc_url(home_url('/app/')).'">Otevřít Adrenaline Live</a>';
+            $html .= '<a class="arc-install-open" href="'.esc_url(ARC_Config::app_url()).'">Otevřít '.esc_html(ARC_Config::name()).'</a>';
             $html .= '</div></dialog>';
         }
         return $html;

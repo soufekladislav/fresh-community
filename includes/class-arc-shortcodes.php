@@ -42,6 +42,7 @@ final class ARC_Shortcodes {
             'root'=>esc_url_raw(rest_url('ar-community/v1/')),'nonce'=>wp_create_nonce('wp_rest'),
             'loggedIn'=>is_user_logged_in(),'loginUrl'=>function_exists('wc_get_page_permalink')?wc_get_page_permalink('myaccount'):wp_login_url(),
             'cartUrl'=>function_exists('wc_get_cart_url')?wc_get_cart_url():'',
+            'name'=>ARC_Config::name(),
         ]);
     }
     private static function card_product(int $id, int $affiliate_owner=0): string {
@@ -56,17 +57,18 @@ final class ARC_Shortcodes {
         self::assets();
         wp_enqueue_script('arc-account-extra');
         wp_enqueue_script('arc-notifications');
+        if(ARC_Access::invite_only() && !ARC_Access::member())return ARC_Access::denied();
         if(!is_user_logged_in()) return '<div class="arc-wrap"><p>Pro správu komunitního profilu se prosím přihlas nebo registruj.</p></div>';
         if(isset($_GET['arc_profile_preview'])) return self::profile();
         $uid=get_current_user_id();
-        $preview=add_query_arg('arc_profile_preview','1',function_exists('wc_get_account_endpoint_url')?wc_get_account_endpoint_url('ar-community'):home_url('/muj-ucet/'));
+        $preview=add_query_arg('arc_profile_preview','1',function_exists('wc_get_account_endpoint_url')?wc_get_account_endpoint_url('ar-community'):ARC_Data::member_url($uid));
         $public=ARC_Data::member_url($uid);
         $avatar=ARC_Profile::avatar_url($uid);
         $avatar_html=$avatar?'<img src="'.esc_url($avatar).'" width="88" height="88" alt="Náhled profilové fotografie">':'<span aria-hidden="true">＋</span>';
         $share=esc_url($public); 
         return '<div class="arc-wrap arc-account" data-arc-account>
           <h2>Moje komunita</h2>
-          <p class="arc-account-intro">Tvůj prostor v Adrenaline Live – přátelé, zážitky, zprávy a praktické odkazy na jednom místě.</p>
+          <p class="arc-account-intro">Tvůj prostor v '.esc_html(ARC_Config::name()).' – přátelé, příspěvky a oznámení na jednom místě.</p>
           '.self::notifications_markup().'
           <div class="arc-masonry">
             <div class="arc-account-column arc-account-main">
@@ -84,38 +86,38 @@ final class ARC_Shortcodes {
                 </div>
               </div>
               <form data-arc-profile>
-                <label>Zobrazované jméno (AR a WordPress)<input name="alias" minlength="2" maxlength="65" required placeholder="Jméno viditelné u příspěvků, přátel a oznámení"></label><p class="arc-small">Změna se propíše také do zobrazovaného jména a přezdívky WordPress účtu. Přihlašovací jméno a e-mail se nemění.</p>
+                <label>Zobrazované jméno (komunita a WordPress)<input name="alias" minlength="2" maxlength="65" required placeholder="Jméno viditelné u příspěvků, přátel a oznámení"></label><p class="arc-small">Změna se propíše také do zobrazovaného jména a přezdívky WordPress účtu. Přihlašovací jméno a e-mail se nemění.</p>
                 <label for="arc-bio-editor">O mně</label><div class="arc-bio-toolbar"><button type="button" data-arc-rich="bold" aria-label="Tučný text"><strong>B</strong></button><button type="button" data-arc-rich="link" aria-label="Vložit odkaz">🔗 Odkaz</button></div><div id="arc-bio-editor" class="arc-bio-editor" contenteditable="true" role="textbox" aria-multiline="true" aria-label="O mně – tučné písmo a odkazy" data-arc-bio-editor></div><textarea name="bio" rows="3" class="arc-bio-fallback" aria-label="O mně" hidden></textarea>
-                <label>Oblíbené sporty<input name="interests" maxlength="250" placeholder="Turistika, cyklistika…"></label>
-                <label>Můj vztah ke sportu<input name="sport_relation" maxlength="120" placeholder="Rekreační sportovec, nadšený turista…"></label>
+                <label>Zájmy<input name="interests" maxlength="250" placeholder="Moje zájmy…"></label>
+                '.(ARC_Config::enabled('sport_fields')?'<label>Můj vztah ke sportu<input name="sport_relation" maxlength="120" placeholder="Rekreační sportovec, nadšený turista…"></label>
                 <fieldset class="arc-sport-professional"><legend>Sportovní profesní profil (nepovinné)</legend>
                   <label>Moje sportovní profese a služby<input name="sport_profession" maxlength="160" placeholder="Fyzioterapeut, masér, fitness trenér, průvodce…"></label>
                   <label>Sportovní znalosti a profesní zkušenosti<textarea name="sport_experience" rows="3" maxlength="900" placeholder="Specializace, praxe, certifikace, co mohu nabídnout ostatním…"></textarea></label>
                   <p class="arc-small">Údaje se zobrazují jen návštěvníkům, kterým je přístupný tvůj profil. Budou podkladem pro budoucí vyhledávání odborníků.</p>
-                </fieldset>
+                </fieldset>':'').'
                 <label>Viditelnost profilu<select name="visibility"><option value="private">Neveřejný – pouze já</option><option value="network">Jen potvrzení přátelé</option><option value="public">Veřejný – všichni</option></select></label>
                 <label class="arc-optin-label"><input type="checkbox" name="email_notifications" value="1"> Chci dostávat oznámení z komunity také e-mailem (výchozí nastavení: zapnuto).</label>
-                <label class="arc-optin-label"><input type="checkbox" name="marketing_optin" value="1"> Chci dostávat dobrovolná obchodní oznámení AR v komunitní aplikaci. Souhlas mohu kdykoli odvolat.</label>
+                <label class="arc-optin-label"><input type="checkbox" name="marketing_optin" value="1"> Chci dostávat dobrovolná obchodní oznámení od provozovatele komunity. Souhlas mohu kdykoli odvolat.</label>
                 <p class="arc-small">Nastavení profilu neurčuje viditelnost jednotlivých příspěvků. Fakturační údaje a affiliate vazby se nezveřejňují.</p>
                 <div class="arc-inline"><button type="submit" class="arc-btn">Uložit profil</button><a class="arc-btn arc-btn-subtle arc-account-link" href="'.esc_url($preview).'">Náhled profilu</a></div>
                 <p class="arc-inline-status" data-arc-profile-saved role="status" aria-live="polite"></p>
                 <div class="arc-profile-share"><label for="arc-share-url">Odkaz na můj komunitní profil</label><div class="arc-share-row"><input id="arc-share-url" type="url" value="'.esc_attr($public).'" readonly><button type="button" class="arc-btn arc-btn-subtle" data-arc-copy-profile>Kopírovat</button></div><small>Odkaz si můžeš prohlédnout nebo sdílet. Pokud je profil neveřejný, ostatní jeho obsah neuvidí.</small><a href="'.esc_url($public).'" target="_blank" rel="noopener">Zobrazit svůj profil ↗</a></div>
               </form>
             </section>
-            <section class="arc-panel arc-premium-panel"><div class="arc-premium-eyebrow">PŘIPRAVUJEME</div><h3>ADRENALINE LIVE <span>Premium</span></h3>
+            '.(ARC_Config::enabled('show_premium')?'<section class="arc-panel arc-premium-panel"><div class="arc-premium-eyebrow">PŘIPRAVUJEME</div><h3>'.esc_html(ARC_Config::name()).' <span>Premium</span></h3>
               <p>Více zážitků a výhod na jednom místě. Připravujeme nadstandardní aplikace, služby a speciální nabídky.</p>
               <p class="arc-small">Jídelníček, mapy tras a servisů, sportovní benefity a další funkce postupně. Prémiové nástroje budou zpřístupněny po jejich dokončení.</p>
               <a class="arc-premium-pill" href="'.esc_url(home_url('/premium/')).'">Otevřít Premium →</a>
-            </section>
+            </section>':'').'
             </div>
             <div class="arc-account-column arc-account-side">
             <section class="arc-panel arc-friends-panel"><div class="arc-friends-panel-heading"><h3>Přátelé</h3><a class="arc-account-link" href="'.esc_url(ARC_Navigation::app_link('pratele')).'">Spravovat přátele →</a></div>
               '.self::friends_markup().'
             </section>
-            <section class="arc-panel arc-products-panel"><div class="arc-saved-heading"><h3>Oblíbené produkty</h3><a class="arc-saved-all-link" href="'.esc_url(ARC_Saved::url('products')).'">Spravovat uložené →</a></div>
+            '.(ARC_Config::enabled('show_shop') && function_exists('wc_get_products')?'<section class="arc-panel arc-products-panel"><div class="arc-saved-heading"><h3>Oblíbené produkty</h3><a class="arc-saved-all-link" href="'.esc_url(ARC_Saved::url('products')).'">Spravovat uložené →</a></div>
               <p class="arc-small">Oblíbené produkty a balíčky nyní spravuješ na stránce Uložené.</p>
               '.ARC_Saved::favorite_products(['limit'=>4,'compact'=>1]).'
-            </section>
+            </section>':'').'
             <section class="arc-panel arc-saved-posts-panel" id="arc-saved-posts"><div class="arc-saved-heading"><h3>Uložené příspěvky</h3><a class="arc-saved-all-link" href="'.esc_url(ARC_Saved::url('posts')).'">Zobrazit všechny →</a></div>
               <p class="arc-small">Příspěvky a články, které si chceš přečíst nebo prohlédnout později.</p>
               '.ARC_Saved::saved_posts_markup(5,false).'
@@ -129,12 +131,13 @@ final class ARC_Shortcodes {
     /** Responsive community friends. Account dashboard keeps its legacy compact tools. */
     public static function friends_page(): string {
         self::assets();wp_enqueue_style('arc-social-pages');wp_enqueue_script('arc-social-pages');
+        if(ARC_Access::invite_only() && !ARC_Access::member())return ARC_Access::denied();
         if(!is_user_logged_in())return '<div class="arc-social-shell"><p>Pro přístup k přátelům se přihlas.</p><a href="'.esc_url(wp_login_url(get_permalink())).'">Přihlásit se</a></div>';
         $linkBanner='';
         $linkToken=isset($_GET['arc_invite']) && is_scalar($_GET['arc_invite'])?sanitize_text_field(wp_unslash($_GET['arc_invite'])):'';
         $inviter=$linkToken?ARC_Invites::inviter_for_token($linkToken):0;
         if($inviter && $inviter!==get_current_user_id())
-            $linkBanner='<div class="arc-invite-link-banner" data-arc-invite-link-banner><strong>Pozvánka od '.esc_html(ARC_Profile::display_alias($inviter)).'</strong><p>Potvrzením se stanete přáteli v Adrenaline Live. Referenční přiřazení existujících účtů zůstává nedotčené.</p><button type="button" class="arc-social-btn arc-social-primary" data-arc-accept-invite="'.esc_attr($linkToken).'">Přijmout pozvánku</button></div>';
+            $linkBanner='<div class="arc-invite-link-banner" data-arc-invite-link-banner><strong>Pozvánka od '.esc_html(ARC_Profile::display_alias($inviter)).'</strong><p>Potvrzením se stanete přáteli v komunitě. Referenční přiřazení existujících účtů zůstává nedotčené.</p><button type="button" class="arc-social-btn arc-social-primary" data-arc-accept-invite="'.esc_attr($linkToken).'">Přijmout pozvánku</button></div>';
         return '<div class="arc-social-shell arc-social-friends" data-arc-social="friends" data-arc-loading="true">'.$linkBanner.'
           <header class="arc-social-heading"><h2>Přátelé</h2><button type="button" class="arc-social-btn arc-social-primary" data-arc-view="invite">Pozvat přátele</button></header>
           <nav class="arc-social-tabs" aria-label="Sekce přátel"><button type="button" class="is-active" data-arc-view="list">Moji přátelé</button><button type="button" data-arc-view="invite">Pozvat přátele</button><button type="button" data-arc-view="requests">Nové žádosti <span data-arc-requests-count></span></button></nav>
@@ -163,6 +166,7 @@ final class ARC_Shortcodes {
     }
     public static function notifications_page(): string {
         self::assets();wp_enqueue_style('arc-social-pages');wp_enqueue_script('arc-social-pages');
+        if(ARC_Access::invite_only() && !ARC_Access::member())return ARC_Access::denied();
         if(!is_user_logged_in())return '<div class="arc-social-shell"><p>Pro zobrazení oznámení se přihlas.</p><a href="'.esc_url(wp_login_url(get_permalink())).'">Přihlásit se</a></div>';
         return '<div class="arc-social-shell arc-social-notifications" data-arc-social="notifications" data-arc-loading="true"><header class="arc-social-heading arc-social-heading-actions"><button type="button" class="arc-social-btn" data-arc-notify-readall>Označit vše přečtené</button></header><nav class="arc-social-tabs" aria-label="Filtr oznámení"><button type="button" class="is-active" data-arc-notify-filter="all">Všechna</button><button type="button" data-arc-notify-filter="unread">Nepřečtená</button></nav><div class="arc-social-notice-list" data-arc-social-notices aria-live="polite">Načítám oznámení…</div><p data-arc-social-status class="arc-social-status" role="status" aria-live="polite"></p></div>';
     }
@@ -235,6 +239,7 @@ final class ARC_Shortcodes {
         return $html.'</div></div>';
     }
     public static function people(): string {
+        if(ARC_Access::invite_only() && !ARC_Access::member())return ARC_Access::denied();
         if(isset($_GET['ar_member'])) return self::profile();
         self::assets();
         $users=get_users(['meta_key'=>'_arc_profile_visibility','meta_value'=>'public','number'=>32,'orderby'=>'registered','order'=>'DESC']);
@@ -249,6 +254,7 @@ final class ARC_Shortcodes {
     /** One Elementor template + query arg makes a unique shareable URL for each member. */
     public static function profile(): string {
         self::assets();
+        if(ARC_Access::invite_only() && !ARC_Access::member())return ARC_Access::denied();
         $id=isset($_GET['ar_member'])?absint(wp_unslash($_GET['ar_member'])):get_current_user_id();
         if(!$id)return '<div class="arc-wrap"><p>Profil vyžaduje přihlášení nebo odkaz na člena.</p></div>';
         $viewer=get_current_user_id();$owner=$id===$viewer;
@@ -258,22 +264,23 @@ final class ARC_Shortcodes {
         $avatarHtml=$avatar?'<img class="arc-profile-avatar" src="'.esc_url($avatar).'" alt="Fotografie profilu" width="132" height="132">':'<span class="arc-profile-avatar arc-profile-avatar-blank" aria-hidden="true">'.esc_html(mb_substr(ARC_Profile::display_alias($id),0,1)).'</span>';
         $bio=ARC_Profile::bio_html((string)get_user_meta($id,ARC_Data::META_BIO,true));
         $scopeText=['private'=>'Soukromý – pouze já','network'=>'Jen potvrzení přátelé','public'=>'Veřejný – všichni'][ARC_Profile::visibility($id)]??'Soukromý';
-        $html='<div class="arc-wrap arc-public-profile"><header class="arc-public-hero">'.$avatarHtml.'<div class="arc-public-hero-text"><h1>'.esc_html(ARC_Profile::display_alias($id)).'</h1><p class="arc-public-visibility">Viditelnost profilu: '.esc_html($scopeText).'</p><div class="arc-public-bio">'.($bio!==''?wpautop($bio):'<p>Člen komunity Adrenaline Race</p>').'</div>';
+        $html='<div class="arc-wrap arc-public-profile"><header class="arc-public-hero">'.$avatarHtml.'<div class="arc-public-hero-text"><h1>'.esc_html(ARC_Profile::display_alias($id)).'</h1><p class="arc-public-visibility">Viditelnost profilu: '.esc_html($scopeText).'</p><div class="arc-public-bio">'.($bio!==''?wpautop($bio):'<p>Člen komunity</p>').'</div>';
         $interests=sanitize_text_field((string)get_user_meta($id,ARC_Data::META_INTERESTS,true));
         if($interests!=='') {
-            $html.='<div class="arc-profile-interests"><strong>Oblíbené sporty</strong><div class="arc-interest-tags">';
+            $html.='<div class="arc-profile-interests"><strong>Zájmy</strong><div class="arc-interest-tags">';
             foreach(array_filter(array_map('trim',explode(',',$interests))) as $interest)$html.='<span>'.esc_html($interest).'</span>';
             $html.='</div></div>';
         }
         $profession=sanitize_text_field((string)get_user_meta($id,'_arc_sport_profession',true));
         $experience=sanitize_textarea_field((string)get_user_meta($id,'_arc_sport_experience',true));
-        if($profession!=='' || $experience!=='') {
+        if(ARC_Config::enabled('sport_fields') && ($profession!=='' || $experience!=='')) {
             $html.='<section class="arc-profile-professional"><h2>Sportovní profese a zkušenosti</h2>';
             if($profession!=='') $html.='<strong>'.esc_html($profession).'</strong>';
             if($experience!=='') $html.='<div>'.wpautop(esc_html($experience)).'</div>';
             $html.='</section>';
         }
-        if($owner)$html.='<p><a class="arc-account-link" href="'.esc_url(function_exists('wc_get_account_endpoint_url')?wc_get_account_endpoint_url('ar-community'):home_url('/muj-ucet/')).'">Upravit můj profil</a></p>';
+        if(!$owner && is_user_logged_in() && ARC_Relations::connected($viewer,$id))$html.='<p><a class="arc-account-link" href="'.esc_url(add_query_arg('with',$id,ARC_Setup::url('messages'))).'">Poslat soukromou zprávu</a></p>';
+        if($owner)$html.='<p><a class="arc-account-link" href="'.esc_url(function_exists('wc_get_account_endpoint_url')?wc_get_account_endpoint_url('ar-community'):ARC_Config::app_url()).'">Upravit můj profil</a></p>';
         if($owner){
         $html.='</div><aside class="arc-profile-social"><h2>Přátelé</h2><p class="arc-profile-vis"><strong>Viditelnost profilu:</strong> '.esc_html(['private'=>'Soukromý – pouze já','network'=>'Jen potvrzení přátelé','public'=>'Veřejný – všichni'][ARC_Profile::visibility($id)]??'Soukromý').'</p>';
         $allFriends=ARC_Relations::connected_ids($id);

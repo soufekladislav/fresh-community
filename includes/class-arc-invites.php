@@ -6,10 +6,10 @@ final class ARC_Invites {
     private const TTL=2592000; // 30 days
     private static function key(string $token): string { return 'arc_join_'.hash('sha256',$token); }
     public static function issue(int $inviter): string {
-        if(ARC_Profile::visibility($inviter)==='private')return '';
+        if(!ARC_Access::member($inviter) || (ARC_Profile::visibility($inviter)==='private' && !user_can($inviter,'manage_options')))return '';
         $token=bin2hex(random_bytes(24));
         set_transient(self::key($token),$inviter,self::TTL);
-        $url=add_query_arg('arc_invite',$token,home_url('/muj-ucet/'));
+        $url=add_query_arg('arc_invite',$token,ARC_Config::app_url());
         if(class_exists('Fresh_Affiliate_DB') && class_exists('Fresh_Affiliate_Tracker')) {
             $affiliate=Fresh_Affiliate_DB::get_affiliate_by_user($inviter);
             if($affiliate && (string)$affiliate->status==='active') {
@@ -17,6 +17,10 @@ final class ARC_Invites {
             }
         }
         return $url;
+    }
+    public static function has_valid_cookie(): bool {
+        $inviter=self::inviter(self::token());
+        return $inviter>0 && get_userdata($inviter) && ARC_Access::member($inviter);
     }
     private static function token(): string {
         $raw=$_COOKIE[self::COOKIE]??'';
@@ -57,15 +61,16 @@ final class ARC_Invites {
     public static function notice(): void {
         $inviter=self::inviter(self::token());
         if(!$inviter || is_user_logged_in())return;
-        echo '<div class="woocommerce-info">Pozvánka do Adrenaline Live od '.esc_html(ARC_Profile::display_alias($inviter)).'. Dokončením registrace se stanete přáteli v jeho komunitě. Pokud je zvoucí také referenčním partnerem, uplatní se pravidla referenčního programu Adrenaline Race.</div>';
+        echo '<div class="woocommerce-info">Pozvánka do '.esc_html(ARC_Config::name()).' od '.esc_html(ARC_Profile::display_alias($inviter)).'. Dokončením registrace se stanete přáteli v jeho komunitě. Pokud je zvoucí také referenčním partnerem, mohou se uplatnit pravidla referenčního programu.</div>';
     }
     public static function on_register(int $uid): void {
         $token=self::token();$inviter=self::inviter($token);
-        if(!$inviter || $inviter===$uid || !get_userdata($inviter))return;
+        if(!self::has_valid_cookie() || !$inviter || $inviter===$uid || !get_userdata($inviter))return;
         // Explicit invitation link: create the connection only for the newly-created account.
         global $wpdb;$table=ARC_Relations::table();
         $result=$wpdb->query($wpdb->prepare("INSERT INTO $table (user_id,target_id,kind,status,created_at) VALUES (%d,%d,'connection','accepted',%s) ON DUPLICATE KEY UPDATE status='accepted'",$inviter,$uid,current_time('mysql',true)));
         if($result===false || !ARC_Relations::connected($inviter,$uid))return;
+        update_user_meta($uid,ARC_Access::APPROVED,'1');
         ARC_Notifications::accepted($uid,$inviter);
         // Fresh Affiliate is the only attribution authority; never rewrite an existing lifetime assignment.
         if(class_exists('Fresh_Affiliate_Lifetime') && class_exists('Fresh_Affiliate_DB')){
@@ -86,7 +91,7 @@ final class ARC_Invites {
     /** An invited existing member must confirm after clicking the link. */
     public static function accept_link(int $uid,string $token): array|WP_Error {
         $inviter=self::inviter_for_token($token);
-        if(!$inviter || $inviter===$uid || !get_userdata($inviter) || !get_userdata($uid))return new WP_Error('arc_invite_expired','Pozvánka vypršela nebo je neplatná.',['status'=>400]);
+        if(!$inviter || !ARC_Access::member($inviter) || $inviter===$uid || !get_userdata($inviter) || !get_userdata($uid))return new WP_Error('arc_invite_expired','Pozvánka vypršela nebo je neplatná.',['status'=>400]);
         if(!ARC_Relations::connected($inviter,$uid)){
             $request=ARC_Relations::invite_known_email($inviter,$uid);
             if(is_wp_error($request))return $request;
@@ -99,6 +104,7 @@ final class ARC_Invites {
         }
         $affiliateResult=ARC_Integrations::attribute_accepted_invite($inviter,$uid);
         if($affiliateResult==='other')ARC_Notifications::affiliate_conflict($uid,$inviter);
+        update_user_meta($uid,ARC_Access::APPROVED,'1');
         delete_transient(self::key($token));self::clear_cookie();
         return ['ok'=>true,'message'=>'Pozvánka přijata, nyní jste přátelé.'];
     }
@@ -113,11 +119,10 @@ final class ARC_Invites {
         $url=self::issue($uid);
         if($url==='')return false;
         $name=ARC_Profile::display_alias($uid);
-        return wp_mail($email,'Pozvánka do Adrenaline Live',
-          "Ahoj,\n\n".$name." tě zve do sportovní komunity Adrenaline Live.\n".
+        return wp_mail($email,'Pozvánka do '.ARC_Config::name(),
+          "Ahoj,\n\n".$name." tě zve do komunity ".ARC_Config::name().".\n".
           "Otevři pozvánku a vytvoř účet: ".$url."\n\n".
-          "Při registraci se automaticky připojíš ke zvoucímu jako přítel.\n".
-          "Pokud je zvoucí referenční partner, mohou platit pravidla referenčního programu.\n\n".
-          "Adrenaline Race\n");
+          "Při registraci se automaticky připojíš ke zvoucímu jako přítel.\n\n".
+          ARC_Config::name()."\n");
     }
 }

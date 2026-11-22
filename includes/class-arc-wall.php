@@ -81,7 +81,7 @@ final class ARC_Wall {
           'profile_url'=>$profileVisible?ARC_Data::member_url($author):'',
           'avatar'=>$profileVisible?ARC_Profile::avatar_url($author):'',
           'body'=>wp_strip_all_tags($p->post_content),'visibility'=>$scope,
-          'url'=>$scope==='public'?add_query_arg('arc_post',(int)$p->ID,home_url('/app/')):'',
+          'url'=>$scope==='public'?add_query_arg('arc_post',(int)$p->ID,ARC_Config::app_url()):'',
           'image'=> $privateMedia?ARC_Wall_Private_Media::url((int)$p->ID):($scope==='public'?self::photo($imageId,$author):''),
           'video'=>$video,'date'=>get_post_time('c',true,$p),
           'can_edit'=>$viewer===$author || ($viewer && user_can($viewer,'manage_options')),

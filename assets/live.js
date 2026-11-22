@@ -157,7 +157,7 @@ const showDeepPost=async()=>{
 
 const loadFeed=async(reset=true)=>{
  if(loading)return;loading=true;
- if(reset){page=1;cardCache.clear();feed.innerHTML='<div class="arc-content-loader" role="status"><span class="arc-content-loader-spin" aria-hidden="true"></span><strong>Načítám příspěvky…</strong><small>Adrenaline Live připravuje obsah.</small></div>';}
+ if(reset){page=1;cardCache.clear();feed.innerHTML='<div class="arc-content-loader" role="status"><span class="arc-content-loader-spin" aria-hidden="true"></span><strong>Načítám příspěvky…</strong><small>Komunita připravuje obsah.</small></div>';}
  try{
   const data=await api('feed?filter='+encodeURIComponent(filter)+'&page='+page);
   const html=(data.items||[]).map(item=>{cardCache.set(item.type+':'+item.id,item);return card(item);}).join('');
@@ -248,7 +248,7 @@ compose?.addEventListener('submit',async e=>{
   const values=new FormData(compose),image=composeMode==='photo'?values.get('image'):null;let imageId=0,privatePhoto='';
   const video=composeMode==='video'?String(values.get('video')||'').trim():'';
   if(composeMode==='photo'&&(!image||!image.size))throw Error('Vyber fotografii.');
-  if(composeMode==='video'&&!video)throw Error('Vlož odkaz na video z YouTube. Pro nahrání nového videa použij tlačítko „Nahrát na kanál Adrenaline Race“.');
+  if(composeMode==='video'&&!video)throw Error('Vlož odkaz na video z YouTube nebo použij komunitní nahrávání, pokud je povoleno.');
   if(composeMode==='text'&&String(values.get('body')||'').trim().length<2)throw Error('Napiš alespoň dva znaky.');
   if(image && image.size>0){
    msg('[data-arc-form-message]','Připravuji fotografii…');
@@ -281,14 +281,14 @@ const shareForm=async(c,id,type)=>{
  const panel=actionPanel(c);if(!panel)return;panel.hidden=false;
  const item=cardCache.get(type+':'+id);
  const publicUrl=(item&&item.visibility==='public'&&item.url)?String(item.url):'';
- const text=type==='article'?(item?.title||'Článek Adrenaline Race'):'Zajímavý příspěvek z Adrenaline Live';
+ const text=type==='article'?(item?.title||'Článek z komunity'):'Zajímavý příspěvek z '+(cfg.name||'komunity');
  const ext=publicUrl?`<div class="arc-external-shares"><strong>Sdílet také mimo komunitu</strong><a target="_blank" rel="noopener noreferrer nofollow" href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(publicUrl)}">Facebook</a><a target="_blank" rel="noopener noreferrer nofollow" href="https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(publicUrl)}">LinkedIn</a><a target="_blank" rel="noopener noreferrer nofollow" href="https://api.whatsapp.com/send?text=${encodeURIComponent(text+' '+publicUrl)}">WhatsApp</a></div>`:'<p class="arc-share-private-note">Externí sdílení je dostupné jen u veřejných příspěvků a článků.</p>';
  if(!cfg.loggedIn){panel.innerHTML=ext+`<p>Pro sdílení na svou zeď se nejprve přihlas.</p>`;return;}
  panel.textContent='Načítám přátele…';
  try{
   if(!friendsCache)friendsCache=(await api('friends')).items||[];
   const options=friendsCache.filter(f=>!f.hidden).map(f=>`<option value="${Number(f.id)}">${esc(f.alias)}</option>`).join('');
-  panel.innerHTML=`<form data-arc-share-form="${id}" data-arc-type="${type}"><strong>Sdílet v Adrenaline Live</strong><label>Kam sdílet?<select name="target_id"><option value="0">Na moji zeď (veřejně)</option>${options}</select></label><label>Vlastní poznámka<textarea maxlength="800" rows="2" name="message" placeholder="Proč to doporučuješ?"></textarea></label><small>Sdílet lze jen veřejný originál. Autor zůstane uveden.</small><div class="arc-edit-buttons"><button type="submit">Sdílet</button><button type="button" data-arc-action-close>Zavřít</button></div></form>${ext}`;
+  panel.innerHTML=`<form data-arc-share-form="${id}" data-arc-type="${type}"><strong>Sdílet v komunitě</strong><label>Kam sdílet?<select name="target_id"><option value="0">Na moji zeď (veřejně)</option>${options}</select></label><label>Vlastní poznámka<textarea maxlength="800" rows="2" name="message" placeholder="Proč to doporučuješ?"></textarea></label><small>Sdílet lze jen veřejný originál. Autor zůstane uveden.</small><div class="arc-edit-buttons"><button type="submit">Sdílet</button><button type="button" data-arc-action-close>Zavřít</button></div></form>${ext}`;
  }catch(e){panel.innerHTML=ext+'<p>'+esc(e.message)+'</p>';}
 };
 app.addEventListener('click',async e=>{
@@ -383,11 +383,11 @@ const loadAlerts=async()=>{
 alerts?.querySelector('[data-arc-live-mark-read]')?.addEventListener('click',async()=>{try{await api('notifications/read',{method:'POST',body:'{}'});loadAlerts();}catch(e){alert(e.message);}});
 const gearTrack=el('[data-arc-gear-products]');
 const loadGear=async()=>{
- const box=el('[data-arc-gear]');if(!box||!gearTrack)return;
+ const box=el('[data-arc-gear]');if(!cfg.showShop||!box||!gearTrack)return;
  try{const data=await api('gear');if(!data.items?.length)return;
-  gearTrack.innerHTML=data.items.slice(0,20).map(g=>`<article class="arc-gear-card"><a class="arc-gear-product-link" href="${esc(g.url)}">${g.image?`<img src="${esc(g.image)}" loading="lazy" alt="">`:'<span class="arc-gear-no-image">AR</span>'}<span>${esc(g.name)}</span><small>${esc(g.price)}</small></a><button type="button" class="arc-fav arc-fav-icon arc-gear-fav" data-arc-favorite="${Number(g.id)}" aria-pressed="false" aria-label="Přidat do oblíbených" title="Přidat do oblíbených"><span aria-hidden="true">♡</span></button></article>`).join('')+
-  `<a class="arc-gear-card arc-gear-all" href="${esc(cfg.shop)}"><strong>Prohlédnout celý obchod</strong><span>Další vybavení a doplňky z Adrenaline Race</span><span aria-hidden="true">→</span></a>`;
-  const title=box.querySelector('[data-arc-gear-heading]');if(title)title.textContent=data.personalized?'Vybavení podle tvých zájmů':'Tipy z AR Shopu';
+  gearTrack.innerHTML=data.items.slice(0,20).map(g=>`<article class="arc-gear-card"><a class="arc-gear-product-link" href="${esc(g.url)}">${g.image?`<img src="${esc(g.image)}" loading="lazy" alt="">`:'<span class="arc-gear-no-image">✦</span>'}<span>${esc(g.name)}</span><small>${esc(g.price)}</small></a><button type="button" class="arc-fav arc-fav-icon arc-gear-fav" data-arc-favorite="${Number(g.id)}" aria-pressed="false" aria-label="Přidat do oblíbených" title="Přidat do oblíbených"><span aria-hidden="true">♡</span></button></article>`).join('')+
+  `<a class="arc-gear-card arc-gear-all" href="${esc(cfg.shop)}"><strong>Prohlédnout celý obchod</strong><span>Další nabídka z obchodu</span><span aria-hidden="true">→</span></a>`;
+  const title=box.querySelector('[data-arc-gear-heading]');if(title)title.textContent=data.personalized?'Vybavení podle tvých zájmů':'Tipy z obchodu';
   const sub=box.querySelector('[data-arc-gear-subtitle]');if(sub)sub.textContent='Přejdi do obchodu kdykoli · bez reklam ve zdi';
   box.hidden=false;
   window.ARCRefreshFavoriteButtons?.(window.ARC_FAVORITES_IDS||[]);
@@ -410,7 +410,7 @@ const loadSidebar=async()=>{
  }catch(e){profileBox.innerHTML='<p>Profil teď není dostupný.</p>';}
  if(!friendsBox)return;
  try{const data=await api('friends');const friends=(data.items||[]).filter(x=>!x.hidden).slice(0,8);
-  friendsBox.innerHTML=`<div class="arc-side-heading"><h3>Přátelé</h3><a href="${esc(cfg.friendsUrl||'/app/pratele/')}">Zobrazit všechny →</a></div>`+
+  friendsBox.innerHTML=`<div class="arc-side-heading"><h3>Přátelé</h3><a href="${esc(cfg.friendsUrl||'/')}">Zobrazit všechny →</a></div>`+
     (friends.length?`<div class="arc-side-people">${friends.map(f=>`<a href="${esc(f.url)}" class="arc-side-friend">${f.avatar?`<img src="${esc(f.avatar)}" loading="lazy" alt="">`:'<span class="arc-side-friend-empty">AR</span>'}<span>${esc(f.alias)}</span></a>`).join('')}</div>`:'<p>Propoj se se sportovci ve své komunitě.</p>');
  }catch(e){friendsBox.innerHTML='<h3>Přátelé</h3><p>Nepodařilo se načíst přátele.</p>';}
 };
@@ -448,7 +448,7 @@ app.addEventListener('click',e=>{if(!e.target.closest('[data-arc-jump-saved]'))r
 const updateSideNotifications=data=>{
  const box=side('[data-arc-side-notifications]');if(!box)return;
  const items=(data.items||[]).slice(0,5);
- box.innerHTML=`<div class="arc-side-heading"><h3>Poslední oznámení</h3><a href="${esc(cfg.notificationsUrl||'/app/oznameni/')}">Všechna →</a></div>`+(
+ box.innerHTML=`<div class="arc-side-heading"><h3>Poslední oznámení</h3><a href="${esc(cfg.notificationsUrl||'/')}">Všechna →</a></div>`+(
   items.length?`<div class="arc-side-notices">${items.map(x=>`<a href="${esc(x.url)}" class="${x.read?'':'is-unread'}">${esc(x.message)}<small>${esc(x.date||'')}</small></a>`).join('')}</div>`:'<p>Momentálně nemáš nová oznámení.</p>');
 };
 const restoreFeed=async()=>{

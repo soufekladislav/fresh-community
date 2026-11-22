@@ -41,7 +41,7 @@ final class ARC_Live_API {
     public static function invite(WP_REST_Request $r): array|WP_Error { self::fresh(); return ARC_Account::invite(get_current_user_id(),$r); }
     public static function invite_link(): array|WP_Error {
         self::fresh();$uid=get_current_user_id();
-        if(ARC_Profile::visibility($uid)==='private')return self::err('Pro zasílání pozvánek nastav profil na Viditelný v síti nebo Veřejný.',403);
+        if(ARC_Profile::visibility($uid)==='private' && !current_user_can('manage_options'))return self::err('Pro zasílání pozvánek nastav profil na Viditelný v síti nebo Veřejný.',403);
         $key='arc_invite_link_rate_'.$uid;$n=(int)get_transient($key);
         if($n>=30)return self::err('Limit pozvánek byl dosažen.',429);
         set_transient($key,$n+1,HOUR_IN_SECONDS);
@@ -110,7 +110,7 @@ final class ARC_Live_API {
     /** Shop recommendations: match opted-in interests, then top up to 20 with publicly visible stock. */
     public static function gear(): array {
         self::fresh();
-        if(!function_exists('wc_get_products')) return ['items'=>[],'personalized'=>false];
+        if(!ARC_Config::enabled('show_shop') || !function_exists('wc_get_products')) return ['items'=>[],'personalized'=>false];
         $uid=get_current_user_id();
         $raw=$uid?(string)get_user_meta($uid,ARC_Data::META_INTERESTS,true):'';
         $keywords=array_values(array_filter(array_map('trim',preg_split('/[,;\n]+/u',mb_strtolower($raw)))));

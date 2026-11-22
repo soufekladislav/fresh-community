@@ -17,6 +17,7 @@ final class ARC_Admin {
             if ($client === '' || preg_match('/^[0-9]+-[a-z0-9-]+\.apps\.googleusercontent\.com$/i', $client))
                 update_option('arc_google_client_id', $client, false);
         }
+        ARC_Config::save_from_post($_POST);
         $type=sanitize_key((string)wp_unslash($_POST['arc_legacy_type']??'post')); 
         update_option('arc_legacy_type',post_type_exists($type)?$type:'post',false);
         wp_safe_redirect(add_query_arg('updated','1',admin_url('admin.php?page=ar-community')));exit;
@@ -51,14 +52,32 @@ final class ARC_Admin {
     public static function page(): void {
         if(!current_user_can('manage_options')) return;
         $status=ARC_Integrations::status();
-        echo '<div class="wrap"><h1>AR Community '.esc_html(ARC_VERSION).'</h1>';
+        echo '<div class="wrap"><h1>Fresh Community '.esc_html(ARC_VERSION).'</h1>';
         if(isset($_GET['updated'])) echo '<div class="notice notice-success"><p>Nastavení uloženo.</p></div>';
-        echo '<p>Nové jádro komunitní zdi. Bez automatických změn článků, bez spuštění Fresh Event a bez změny Stripe předplatného.</p>';
+        echo '<p>Konfigurace samostatné komunitní sítě. Uložením nastavení se nemění existující účty ani obsah.</p>';
         echo '<h2>Stav komponent</h2><table class="widefat striped"><tbody>';
-        foreach(['woocommerce'=>'WooCommerce','affiliate'=>'Fresh Affiliate (pokud je na AR)','fresh_sales'=>'Fresh Sales (jen vazba)','advisor_provider'=>'AI poradce – připojený provider'] as $key=>$label)
+        foreach(['woocommerce'=>'WooCommerce (volitelné)','affiliate'=>'Fresh Affiliate (volitelné)','fresh_sales'=>'Fresh Sales (jen vazba)','advisor_provider'=>'AI poradce – připojený provider'] as $key=>$label)
             echo '<tr><td>'.esc_html($label).'</td><td>'.($status[$key]?'<strong style="color:green">K dispozici</strong>':'Nenalezeno / zatím nevytvořeno').'</td></tr>';
-        echo '</tbody></table><h2>Stránky a původní Lidé</h2><form method="post" action="'.esc_url(admin_url('admin-post.php')).'">';
+        echo '</tbody></table><h2>Identita a funkce komunity</h2><form method="post" action="'.esc_url(admin_url('admin-post.php')).'">';
         echo '<input type="hidden" name="action" value="arc_save_settings">';wp_nonce_field('arc_save_settings');
+        $config=ARC_Config::all();
+        foreach(['name'=>'Název komunity','short_name'=>'Krátký název (PWA)','description'=>'Popis komunity'] as $field=>$label){
+            echo '<p><label><strong>'.esc_html($label).'</strong><br><input class="regular-text" name="arc_'.esc_attr($field).'" value="'.esc_attr((string)$config[$field]).'" maxlength="'.($field==='description'?220:($field==='name'?80:28)).'"></label></p>';
+        }
+        echo '<p><label><strong>Hlavní stránka komunity</strong> ';wp_dropdown_pages(['name'=>'arc_app_page_id','selected'=>absint($config['app_page_id']),'show_option_none'=>'— vyberte stránku s [ar_live] —','option_none_value'=>0]);echo '</label></p>';
+        echo '<p><label><strong>URL obchodu (volitelně)</strong><br><input class="regular-text" type="url" name="arc_shop_url" value="'.esc_attr((string)$config['shop_url']).'" placeholder="https://..."></label></p>';
+        foreach(['show_shop'=>'Zobrazit produkty z WooCommerce','show_premium'=>'Zobrazit položky Premium','show_affiliate'=>'Zobrazit referenční program','show_youtube'=>'Nabídnout odesílání videa na YouTube','global_navigation'=>'Zobrazovat spodní navigaci na všech stránkách webu','woo_dashboard'=>'Nahradit úvodní nástěnku WooCommerce komunitou','sport_fields'=>'Zobrazovat sportovní údaje v profilu'] as $key=>$label){
+            echo '<p><label><input type="checkbox" name="arc_'.esc_attr($key).'" value="1" '.checked(!empty($config[$key]),true,false).'> '.esc_html($label).'</label></p>';
+        }
+        echo '<h3>Registrace a přístup</h3>';
+        echo '<p><label><strong>Režim komunity</strong><br><select name="arc_registration_mode"><option value="invite" '.selected((string)$config['registration_mode'],'invite',false).'>Uzavřená – pouze na pozvánku</option><option value="public" '.selected((string)$config['registration_mode'],'public',false).'>Veřejná registrace</option></select></label></p>';
+        echo '<p class="description">Uzavřený režim omezuje přístup komunitního API a registraci přes standardní WordPress/Woo formuláře. Google registrace nového účtu se v tomto režimu nepovoluje. Nastavení povolení registrace uživatelů ve WordPressu se nepřepisuje.</p>';
+        echo '<h3>Vzhled instalované aplikace (PWA)</h3>';
+        foreach (['icon_192'=>'Ikona 192×192 (URL z Knihovny médií)','icon_512'=>'Ikona 512×512 (URL z Knihovny médií)','theme_color'=>'Barva aplikace (#RRGGBB)','background_color'=>'Barva pozadí (#RRGGBB)'] as $key=>$label) {
+            echo '<p><label><strong>'.esc_html($label).'</strong><br><input class="regular-text" name="arc_'.esc_attr($key).'" value="'.esc_attr((string)$config[$key]).'"></label></p>';
+        }
+        echo '<p class="description">Nevyplněná ikona použije existující ikonu Adrenaline Live pro původní instalaci nebo Site Icon WordPressu pro novou komunitu. Změna ikony či PWA stránky vyžaduje otestování instalované aplikace na zařízeních.</p>';
+        echo '<h2>Další nastavení a stránky</h2>';
         foreach(['profile'=>'Sdílená šablona profilu /profil/','people'=>'Adresář Lidé (historický)','library'=>'Veřejné balíčky','advisor'=>'Osobní poradce'] as $key=>$label) {
             echo '<p><label><strong>'.esc_html($label).'</strong> ';wp_dropdown_pages(['name'=>'arc_page_'.$key,'selected'=>absint(get_option('arc_page_'.$key,0)),
                 'show_option_none'=>'— není přiřazena —','option_none_value'=>0]);echo '</label></p>';
@@ -70,8 +89,9 @@ final class ARC_Admin {
         echo '<p><label><strong>Zdroj historických profilů „Lidé“ (pouze diagnostika)</strong> <select name="arc_legacy_type">';
         foreach($types as $type) echo '<option value="'.esc_attr($type->name).'" '.selected($selected,$type->name,false).'>'.esc_html($type->labels->name.' ('.$type->name.')').'</option>';
         echo '</select></label></p><p><button class="button button-primary">Uložit nastavení</button></p></form>';
-        echo '<p><strong>Nová mapa stránek:</strong> /app/ [ar_live], /pratele/ [ar_community_friends], /profil/ [ar_community_profile], /premium/ [ar_live_premium]. Samostatný jídelníček [adrenaline_life_app] používej až na chráněné stránce /premium/jidelnicek/ po správném přesunu ALF aplikace.</p>';
-        echo '<h2>Adrenaline Live / Shortcody pro Elementor / WP stránky</h2><p><code>[ar_live]</code> · <code>[ar_community_wall]</code> · <code>[ar_community_account]</code> · <code>[ar_community_people]</code> · <code>[ar_community_friends]</code> · <code>[ar_live_navigation]</code> · <code>[ar_community_profile]</code> · <code>[ar_community_library]</code> · <code>[ar_community_advisor]</code> · <code>[ar_live_premium]</code> · <code>[ar_community_submit_article]</code> · <code>[ar_community_favorite_button]</code></p>';
+        echo '<p><strong>Komunitní stránka:</strong> <code>'.esc_html(ARC_Config::app_url()).'</code> s <code>[ar_live]</code>. Název a funkce nastavíte výše.</p>';
+        echo '<h2>Fresh Community / Shortcody pro Elementor a WP stránky</h2><p><code>[ar_live]</code> · <code>[ar_community_wall]</code> · <code>[ar_community_account]</code> · <code>[ar_community_people]</code> · <code>[ar_community_friends]</code> · <code>[ar_live_navigation]</code> · <code>[ar_community_profile]</code> · <code>[ar_community_library]</code> · <code>[ar_community_advisor]</code> · <code>[ar_live_premium]</code> · <code>[ar_community_submit_article]</code> · <code>[ar_community_favorite_button]</code></p>';
+        if(ARC_Config::legacy_site()){
         echo '<h2>Diagnostika migrace bez zápisu</h2><p>Vybraný typ příspěvku: <code>'.esc_html($selected).'</code>. Jednoduchý náhled nemůže bezpečně rozpoznat osobu jen podle autora, protože historické příspěvky mohl vytvářet administrátor.</p>';
         $rows=get_posts(['post_type'=>$selected,'post_status'=>['publish','draft','private'],'posts_per_page'=>15]);
         echo '<table class="widefat striped"><thead><tr><th>ID</th><th>Historický příspěvek</th><th>Autor příspěvku</th><th>Ověřený profil</th></tr></thead><tbody>';
@@ -89,6 +109,7 @@ final class ARC_Admin {
         echo '<form method="post" action="'.esc_url(admin_url('admin-post.php')).'"><input type="hidden" name="action" value="arc_move_legacy_app">';
         wp_nonce_field('arc_move_legacy_app');
         echo '<button type="submit" class="button">Po kontrole stránek přesunout pouze staré rozhraní ALF do Premium</button></form>';
+        }
         echo '<h2>Stávající WP účty – bezpečná inicializace profilů</h2>';
         echo '<p>Každý účet má jeden WP user ID. Nový síťový profil je neveřejný, pokud nebyl již dříve výslovně zveřejněn. Dávka vytvoří pouze chybějící user_meta a nezasahuje do WooCommerce ani Fresh Affiliate.</p>';
         if(isset($_GET['arc_initialized'])) echo '<p>Dokončeno v poslední dávce: '.absint($_GET['arc_initialized']).' uživatelů. '.(!empty($_GET['arc_finished']) && $_GET['arc_finished']==='1'?'Další účty již nezbývají.':'Můžeš pokračovat další dávkou.').'</p>';

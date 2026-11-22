@@ -9,13 +9,15 @@ final class ARC_Saved {
     public static function url(string $tab='posts'): string {
         $page=self::page();
         $base=$page?get_permalink($page):(
-            function_exists('wc_get_account_endpoint_url')?wc_get_account_endpoint_url('ar-community'):home_url('/muj-ucet/')
+            function_exists('wc_get_account_endpoint_url')?wc_get_account_endpoint_url('ar-community'):ARC_Setup::url('account')
         );
         if(!$page)return $base.'#arc-saved-posts';
         return $base; // Combined screen: saved posts + favorite products.
     }
     /** One-time, non-destructive creation of the /ulozene/ page; never override existing content. */
     public static function ensure_page(): void {
+        // Fresh installations create community pages only on explicit admin request.
+        if(!ARC_Config::legacy_site())return;
         if(get_option('arc_saved_page_checked_v1'))return;
         $existing=get_page_by_path('ulozene',OBJECT,'page');
         if($existing instanceof WP_Post){
@@ -109,7 +111,7 @@ final class ARC_Saved {
                 $body=trim(wp_strip_all_tags($post->post_content));
                 $title=wp_trim_words($body,17,'…')?:'Komunitní příspěvek';
                 $image=ARC_Wall::photo((int)get_post_meta($id,'_arc_image_id',true),(int)$post->post_author);
-                $url=home_url('/app/?arc_post='.$id); // Feed only: private CPT has no public permalink.
+                $url=add_query_arg('arc_post',$id,ARC_Config::app_url()); // Feed only: private CPT has no public permalink.
                 $kind='Příspěvek';
             }else{
                 if($post->post_type!=='post' || $post->post_status!=='publish' || $post->post_password!=='')continue;

@@ -41,10 +41,11 @@ final class ARC_Notifications {
                 'accepted'=>$who.' přijal/a tvou pozvánku.',
                 'affiliate_other'=>$who.' je tvým přítelem, ale již má jiného referenčního partnera.',
                 'comment'=>$who.' přidal/a komentář k tvému příspěvku nebo odpověděl/a na tvůj komentář.',
+                'message'=>$who.' ti poslal/a soukromou zprávu.',
                 'post','friend_share'=>$who.' sdílel/a nový komunitní příspěvek.',
                 'article'=>$who.' publikoval/a nový článek.',
                 'broadcast'=>get_the_title((int)$r->object_id),
-                default=>'Nové oznámení z Adrenaline Live.',
+                default=>'Nové oznámení z '.ARC_Config::name().'.',
             };
             if($r->kind==='broadcast'){
                 $post=get_post((int)$r->object_id);
@@ -53,12 +54,18 @@ final class ARC_Notifications {
                 $target=(string)get_post_meta($post->ID,'_arc_target_url',true);
                 if($target && str_starts_with($target,home_url('/')))$link=$target;
             }
-            $subject='Adrenaline Live – nové oznámení';
+            if($r->kind==='message')$link=add_query_arg('with',(int)$r->actor_id,ARC_Setup::url('messages'));
+            $subject=ARC_Config::name().' – nové oznámení';
             $body="Ahoj,\n\n".wp_strip_all_tags($message)."\n\nZobrazit oznámení: ".$link."\n\nE-mailová oznámení můžeš vypnout v Moje komunita → Můj profil.";
             wp_mail($user->user_email,$subject,$body);
         }
         update_option('arc_notify_mail_cursor',$cursor,false);
         if(count($rows)===15)self::schedule_mail();
+    }
+    /** No text previews or content disclosed in notifications. */
+    public static function direct_message(int $actor,int $target,int $messageId): void {
+        if(!ARC_Relations::connected($actor,$target))return;
+        self::insert($target,$actor,'message',$messageId,'message:'.$messageId);
     }
     public static function comment_added(int $actor,int $target,int $postId,int $commentId): void {
         if($target<1||$target===$actor)return;
@@ -123,15 +130,20 @@ final class ARC_Notifications {
                     $campaign=get_post((int)$r->object_id);
                     if(!$campaign || $campaign->post_type!=='arc_broadcast')continue 2;
                     $message=wp_strip_all_tags($campaign->post_title);
-                    $link=esc_url_raw((string)get_post_meta($campaign->ID,'_arc_target_url',true))?:home_url('/app/');
+                    $link=esc_url_raw((string)get_post_meta($campaign->ID,'_arc_target_url',true))?:ARC_Config::app_url();
                     break;
                 case 'accepted':$message=$name.' přijal/a tvou pozvánku.';break;
+                case 'message':
+                    if(!ARC_Relations::connected($actor,$user))continue 2;
+                    $message=$name.' ti poslal/a soukromou zprávu.';
+                    $link=add_query_arg('with',$actor,ARC_Setup::url('messages'));
+                    break;
                 case 'affiliate_other':$message=$name.' je nyní tvým přítelem, ale už patří jinému referenčnímu partnerovi.';break;
-                case 'comment':$post=get_post((int)$r->object_id);if(!$post || !ARC_Wall::can_read($post,$user))continue 2;$message=$name.' napsal/a komentář nebo odpověď.';$link=add_query_arg('arc_post',$post->ID,home_url('/app/'));break;
+                case 'comment':$post=get_post((int)$r->object_id);if(!$post || !ARC_Wall::can_read($post,$user))continue 2;$message=$name.' napsal/a komentář nebo odpověď.';$link=add_query_arg('arc_post',$post->ID,ARC_Config::app_url());break;
                 case 'post':
                     $post=get_post((int)$r->object_id);
                     if(!$post || !ARC_Wall::can_read($post,$user))continue 2;
-                    $message=$name.' zveřejnil/a nový příspěvek.';$link=home_url('/app/');break;
+                    $message=$name.' zveřejnil/a nový příspěvek.';$link=ARC_Config::app_url();break;
                 case 'friend_share':
                     $post=get_post((int)$r->object_id);
                     if(!$post || !ARC_Wall::can_read($post,$user))continue 2;

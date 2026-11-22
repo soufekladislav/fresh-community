@@ -53,6 +53,8 @@ final class ARC_Profile {
         return $alias!==''?$alias:'Člen #'.$uid;
     }
     public static function can_view(int $uid,int $viewer): bool {
+        // A public WP customer profile must not automatically enter a closed community directory.
+        if(ARC_Access::invite_only() && !ARC_Access::member($uid) && !($viewer && user_can($viewer,'manage_options')))return false;
         if($viewer && ($viewer===$uid || user_can($viewer,'manage_options'))) return true;
         if(get_user_meta($uid,'_arc_community_suspended',true))return false;
         $v=self::visibility($uid);
@@ -67,9 +69,9 @@ final class ARC_Profile {
             'visibility'=>self::visibility($uid),
             'bio'=>self::bio_html((string)get_user_meta($uid,ARC_Data::META_BIO,true)),
             'interests'=>sanitize_text_field((string)get_user_meta($uid,ARC_Data::META_INTERESTS,true)),
-            'sport_relation'=>sanitize_text_field((string)get_user_meta($uid,'_arc_sport_relation',true)),
-            'sport_profession'=>sanitize_text_field((string)get_user_meta($uid,'_arc_sport_profession',true)),
-            'sport_experience'=>sanitize_textarea_field((string)get_user_meta($uid,'_arc_sport_experience',true)),
+            'sport_relation'=>ARC_Config::enabled('sport_fields') ? sanitize_text_field((string)get_user_meta($uid,'_arc_sport_relation',true)) : '',
+            'sport_profession'=>ARC_Config::enabled('sport_fields') ? sanitize_text_field((string)get_user_meta($uid,'_arc_sport_profession',true)) : '',
+            'sport_experience'=>ARC_Config::enabled('sport_fields') ? sanitize_textarea_field((string)get_user_meta($uid,'_arc_sport_experience',true)) : '',
             'url'=>ARC_Data::member_url($uid),
             'avatar'=>self::avatar_url($uid), // Only shown if permission check above passed; no Gravatar from billing email.
             'connected'=>$viewer>0?ARC_Relations::connected($uid,$viewer):false,
@@ -135,7 +137,7 @@ final class ARC_Profile {
     /** Business status is an admin-reviewed presentation flag, not an affiliate attribution role. */
     public static function admin_fields(WP_User $u): void {
         if(!current_user_can('edit_user',$u->ID))return;
-        echo '<h2>Adrenaline Live – profesionální profil</h2><table class="form-table"><tr><th><label for="arc_business_status">Obchodní partner</label></th><td>';
+        echo '<h2>Fresh Community – profesionální profil</h2><table class="form-table"><tr><th><label for="arc_business_status">Obchodní partner</label></th><td>';
         wp_nonce_field('arc_business_admin_'.$u->ID,'arc_business_nonce');
         echo '<label><input id="arc_business_status" name="arc_business_status" type="checkbox" value="1" '.checked((string)get_user_meta($u->ID,self::META_KIND,true),'business',false).'> Ověřený obchodní partner</label><p class="description">Toto není změna Fresh Affiliate přiřazení. Veřejný profil zapni teprve po výslovné dohodě s partnerem.</p>';
         echo '<label><input name="arc_business_public_consent" type="checkbox" value="1"> Partner souhlasí se zveřejněním profesionálního profilu</label></td></tr></table>';

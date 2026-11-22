@@ -1,0 +1,32 @@
+name: Fresh Community — syntax and update ZIP
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check-and-package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.0'
+          tools: none
+      - name: PHP syntax
+        run: find . -type f -name '*.php' -not -path './dist/*' -print0 | xargs -0 -n 1 php -l
+      - name: JavaScript syntax
+        run: find assets -type f -name '*.js' -print0 | xargs -0 -n 1 node --check
+      - name: Build update package
+        run: bash scripts/build-update.sh
+      - name: Verify archive structure
+        run: |
+          unzip -Z1 dist/*-update.zip | grep -q '^ar-community/ar-community.php$'
+          unzip -Z1 dist/*-update.zip | grep -q '^ar-community/includes/class-arc-config.php$'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fresh-community-update
+          path: dist/*-update.zip

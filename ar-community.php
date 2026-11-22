@@ -1,8 +1,9 @@
 <?php
 /**
  * Plugin Name: Fresh Community
- * Description: Fresh Community – komunitní jádro Adrenaline Live, profily, sociální vazby, zeď a napojení na AR Shop.
- * Version: 0.2.0-beta.10.16
+ * Description: Konfigurovatelné komunitní prostředí pro WordPress – profily, přátelé, příspěvky a mikrokomunity.
+ * Version: 0.2.0-beta.10.18
+ * Update URI: https://github.com/soufekladislav/fresh-community
  * Requires at least: 6.3
  * Requires PHP: 8.0
  * Text Domain: ar-community
@@ -13,10 +14,14 @@
  * Fresh Description: Komunitní síť
  */
 defined('ABSPATH') || exit;
-define('ARC_VERSION', '0.2.0-beta.10.16');
+define('ARC_VERSION', '0.2.0-beta.10.18');
 define('ARC_FILE', __FILE__);
 define('ARC_PATH', plugin_dir_path(__FILE__));
 define('ARC_URL', plugin_dir_url(__FILE__));
+require_once ARC_PATH . 'includes/class-arc-config.php';
+require_once ARC_PATH . 'includes/class-arc-access.php';
+require_once ARC_PATH . 'includes/class-arc-setup.php';
+require_once ARC_PATH . 'includes/class-arc-messages.php';
 require_once ARC_PATH . 'includes/class-arc-data.php';
 require_once ARC_PATH . 'includes/class-arc-integrations.php';
 require_once ARC_PATH . 'includes/class-arc-price.php';
@@ -49,6 +54,8 @@ require_once ARC_PATH . 'includes/class-arc-youtube.php';
 register_activation_hook(__FILE__, ['AR_Community', 'activate']);
 register_deactivation_hook(__FILE__, ['AR_Community', 'deactivate']);
 add_action('plugins_loaded', ['AR_Community', 'boot']);
+add_action('plugins_loaded', ['ARC_Setup', 'boot']);
+add_action('plugins_loaded', ['ARC_Messages', 'boot']);
 add_action('plugins_loaded', ['ARC_Install', 'boot']);
 add_action('plugins_loaded', ['ARC_PWA_Devices', 'boot']);
 add_action('plugins_loaded', ['ARC_Stripe_Diagnostics', 'boot']);

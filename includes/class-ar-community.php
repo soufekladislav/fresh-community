@@ -11,6 +11,7 @@ final class AR_Community {
     public static function deactivate(): void { flush_rewrite_rules(false); }
     public static function boot(): void {
         ARC_Google::boot();
+        ARC_Access::boot();
         ARC_Account::boot();
         add_action('template_redirect',[ARC_Invites::class,'capture'],2);
         add_action('woocommerce_before_customer_login_form',[ARC_Invites::class,'notice'],5);
@@ -68,7 +69,7 @@ final class AR_Community {
             if(is_page(['pratele','oznameni']) || preg_match('~(?:^|/)app/(?:pratele|oznameni)(?:/|$)~',$path) || is_singular('post') || is_home() || is_archive())
                 wp_enqueue_style('arc-social-pages',ARC_URL.'assets/social-pages.css',[],ARC_VERSION);
             // Elementor may execute a shortcode after wp_head; preload layout CSS here.
-            if(is_page('app') || $path==='app') {
+            if(ARC_Config::is_app_page()) {
                 wp_enqueue_style('arc-live',ARC_URL.'assets/live.css',[],ARC_VERSION);
                 wp_enqueue_style('arc-community');
             }
@@ -83,7 +84,7 @@ final class AR_Community {
     }
     public static function profile_nocache(): void {
         $path=trim((string)wp_parse_url((string)($_SERVER['REQUEST_URI']??''),PHP_URL_PATH),'/');
-        if(isset($_GET['ar_member']) || is_page(['profil','pratele','app','premium','oznameni','ulozene']) || (function_exists('is_wc_endpoint_url') && is_wc_endpoint_url('ar-community')) || (is_user_logged_in() && preg_match('~(?:^|/)muj-ucet/ar-community(?:/|$)~',$path))){
+        if(isset($_GET['ar_member']) || ARC_Config::is_app_page() || is_page(['profil','pratele','premium','oznameni','ulozene']) || (function_exists('is_wc_endpoint_url') && is_wc_endpoint_url('ar-community')) || (is_user_logged_in() && preg_match('~(?:^|/)muj-ucet/ar-community(?:/|$)~',$path))){
             if(!defined('DONOTCACHEPAGE'))define('DONOTCACHEPAGE',true);
             nocache_headers();
         }
@@ -155,11 +156,12 @@ final class AR_Community {
             UNIQUE KEY recipient_event (user_id,event_key),
             KEY inbox (user_id,is_read,created_at)
         ) $charset;");
+        ARC_Messages::install_table();
         update_option('arc_db_version',ARC_VERSION,false);
     }
     public static function woo_endpoint(): void { add_rewrite_endpoint('ar-community', EP_ROOT | EP_PAGES); }
     public static function woo_menu(array $items): array {
-        if (!function_exists('wc_get_account_endpoint_url')) return $items;
+        if (!ARC_Config::enabled('woo_dashboard') || !function_exists('wc_get_account_endpoint_url')) return $items;
         // One canonical community home: Woo's default /muj-ucet/ dashboard.
         // The old /muj-ucet/ar-community/ endpoint stays live for existing links.
         $out=['dashboard'=>'Můj účet','ar-community'=>'Moje komunita'];
@@ -168,7 +170,7 @@ final class AR_Community {
     }
     /** Only the exact My Account root is a community dashboard. All endpoints remain Woo-owned. */
     public static function is_woo_dashboard_root(): bool {
-        if (!is_user_logged_in() || !function_exists('is_account_page') || !is_account_page()
+        if (!ARC_Config::enabled('woo_dashboard') || !is_user_logged_in() || !function_exists('is_account_page') || !is_account_page()
             || !function_exists('wc_get_page_permalink')) return false;
         $request_path = trailingslashit((string)wp_parse_url((string)($_SERVER['REQUEST_URI'] ?? ''), PHP_URL_PATH));
         $account_path = trailingslashit((string)wp_parse_url((string)wc_get_page_permalink('myaccount'), PHP_URL_PATH));
@@ -203,7 +205,8 @@ final class AR_Community {
      *  The legacy /muj-ucet/ login/registration form remains in place for guests.
      */
     public static function community_account_url(): string {
-        $page=get_page_by_path('app/muj-ucet', OBJECT, 'page');
+        if(!ARC_Config::legacy_site() && ARC_Setup::id('account'))return ARC_Setup::url('account');
+        $page=ARC_Config::legacy_site() ? get_page_by_path('app/muj-ucet', OBJECT, 'page') : null;
         if($page instanceof WP_Post && $page->post_status==='publish') {
             $url=get_permalink($page);
             if(is_string($url) && $url) return $url;
@@ -212,7 +215,7 @@ final class AR_Community {
             $url=wc_get_page_permalink('myaccount');
             if(is_string($url) && $url) return $url;
         }
-        return home_url('/muj-ucet/');
+        return ARC_Config::app_url();
     }
     /** After registration, an already logged-in user must not remain on the old registration form.
      *  Keep invitation processing (priority 2), checkout and account endpoints untouched.
@@ -240,7 +243,7 @@ final class AR_Community {
         return true;
     }
     public static function community_auto_login(bool $auto, int $uid): bool {
-        return self::is_community_registration_request() ? false : $auto;
+        return ARC_Config::enabled('woo_dashboard') && self::is_community_registration_request() ? false : $auto;
     }
     public static function verify_community_email($user, $password) {
         if ($user instanceof WP_User && get_user_meta($user->ID,'_arc_email_confirmation_pending',true)==='1') {
@@ -250,7 +253,7 @@ final class AR_Community {
     }
     /** New Woo customers who used generated passwords should see a reassuring notice. */
     public static function customer_password_created(int $user_id, $customer_data, $generated): void {
-        if(self::is_community_registration_request()) {
+        if(ARC_Config::enabled('woo_dashboard') && self::is_community_registration_request()) {
             update_user_meta($user_id,'_arc_email_confirmation_pending','1');
             if(function_exists('wc_add_notice')) wc_add_notice('Účet jsme založili. Na zadaný e-mail jsme poslali odkaz pro nastavení hesla. Otevři jej, nastav heslo a pak se přihlas. Zkontroluj také spam.','success');
         }
@@ -265,8 +268,8 @@ final class AR_Community {
     }
     /** Woo registration success, excluding a user signing up as part of checkout. */
     public static function woo_registration_redirect($url): string {
-        if(function_exists('is_checkout') && is_checkout())return (string)$url;
-        return function_exists('wc_get_page_permalink') ? (string)wc_get_page_permalink('myaccount') : home_url('/muj-ucet/');
+        if(!ARC_Config::enabled('woo_dashboard') || (function_exists('is_checkout') && is_checkout()))return (string)$url;
+        return function_exists('wc_get_page_permalink') ? (string)wc_get_page_permalink('myaccount') : ARC_Config::app_url();
     }
     public static function woo_render(): void { echo do_shortcode('[ar_community_account]'); }
     public static function guard_collection_content($content) { return $content; }

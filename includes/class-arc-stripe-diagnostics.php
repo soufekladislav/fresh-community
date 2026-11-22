@@ -2,7 +2,7 @@
 /** Read-only local Stripe diagnostics. Never starts payments or changes a webhook. */
 defined('ABSPATH') || exit;
 final class ARC_Stripe_Diagnostics {
-    public static function boot(): void { add_action('admin_menu',[self::class,'menu'],30); }
+    public static function boot(): void { if(ARC_Config::legacy_site())add_action('admin_menu',[self::class,'menu'],30); }
     public static function menu(): void {
         add_submenu_page('ar-community','Kontrola Stripe','Kontrola Stripe','manage_woocommerce','arc-stripe-check',[self::class,'render']);
     }
@@ -25,7 +25,7 @@ final class ARC_Stripe_Diagnostics {
         $events=$wpdb->prefix.'alf_billing_events';
         $hasEvents=$wpdb->get_var($wpdb->prepare('SHOW TABLES LIKE %s',$wpdb->esc_like($events)))===$events;
         $errors=$hasEvents?(int)$wpdb->get_var("SELECT COUNT(*) FROM `".esc_sql($events)."` WHERE status='failed'"):0;
-        echo '<div class="wrap"><h1>AR Community – Stripe (lokální diagnostika)</h1>';
+        echo '<div class="wrap"><h1>Fresh Community – Stripe (lokální diagnostika)</h1>';
         echo '<p>Bez přímého přístupu k účtu Stripe tento přehled nemůže potvrdit úspěšné živé platby. Nic nesynchronizuje, nevytváří ani neopravuje.</p>';
         echo '<table class="widefat striped" style="max-width:850px"><tbody>';
         foreach([

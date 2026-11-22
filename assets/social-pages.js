@@ -102,10 +102,10 @@
   const issue=async()=>{const data=await api('invite-link',{method:'POST',body:'{}'});return data.url;};
   const action=async(kind)=>{
    try{
-    const url=await issue(),message='Přidej se ke mně do sportovní komunity Adrenaline Live: '+url;
+    const url=await issue(),message='Přidej se ke mně do komunity '+(ARC.name||'Fresh Community')+': '+url;
     if(kind==='copy'){await navigator.clipboard.writeText(message);notice('Odkaz na pozvánku byl zkopírován.');}
     else if(kind==='whatsapp')window.location.href='https://wa.me/?text='+encodeURIComponent(message);
-    else window.location.href='mailto:?subject='+encodeURIComponent('Pozvánka do Adrenaline Live')+'&body='+encodeURIComponent(message);
+    else window.location.href='mailto:?subject='+encodeURIComponent('Pozvánka do '+(ARC.name||'Fresh Community'))+'&body='+encodeURIComponent(message);
    }catch(e){notice(e.message);}
   };
   $('[data-arc-invite-copy]')?.addEventListener('click',()=>action('copy'));
