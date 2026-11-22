@@ -69,6 +69,9 @@ final class ARC_Admin {
         foreach(['show_shop'=>'Zobrazit produkty z WooCommerce','show_premium'=>'Zobrazit položky Premium','show_affiliate'=>'Zobrazit referenční program','show_youtube'=>'Nabídnout odesílání videa na YouTube','global_navigation'=>'Zobrazovat spodní navigaci na všech stránkách webu','woo_dashboard'=>'Nahradit úvodní nástěnku WooCommerce komunitou','sport_fields'=>'Zobrazovat sportovní údaje v profilu'] as $key=>$label){
             echo '<p><label><input type="checkbox" name="arc_'.esc_attr($key).'" value="1" '.checked(!empty($config[$key]),true,false).'> '.esc_html($label).'</label></p>';
         }
+        echo '<h3>Registrace a přístup</h3>';
+        echo '<p><label><strong>Režim komunity</strong><br><select name="arc_registration_mode"><option value="invite" '.selected((string)$config['registration_mode'],'invite',false).'>Uzavřená – pouze na pozvánku</option><option value="public" '.selected((string)$config['registration_mode'],'public',false).'>Veřejná registrace</option></select></label></p>';
+        echo '<p class="description">Uzavřený režim omezuje přístup komunitního API a registraci přes standardní WordPress/Woo formuláře. Google registrace nového účtu se v tomto režimu nepovoluje. Nastavení povolení registrace uživatelů ve WordPressu se nepřepisuje.</p>';
         echo '<h3>Vzhled instalované aplikace (PWA)</h3>';
         foreach (['icon_192'=>'Ikona 192×192 (URL z Knihovny médií)','icon_512'=>'Ikona 512×512 (URL z Knihovny médií)','theme_color'=>'Barva aplikace (#RRGGBB)','background_color'=>'Barva pozadí (#RRGGBB)'] as $key=>$label) {
             echo '<p><label><strong>'.esc_html($label).'</strong><br><input class="regular-text" name="arc_'.esc_attr($key).'" value="'.esc_attr((string)$config[$key]).'"></label></p>';

@@ -1,5 +1,5 @@
 # Fresh Community — instalace a aktualizační balíčky
-**Vývojová verze:** 0.2.0-beta.10.17 (k revizi na stagingu).
+**Vývojová verze:** 0.2.0-beta.10.18 (k revizi na stagingu).
 
 ## Zásady kompatibility
 - Plugin se uživateli zobrazuje jako **Fresh Community**, ale technický adresář zůstává `ar-community/`.
@@ -25,7 +25,7 @@ Výstup: `dist/fresh-community-0.2.0-beta.10.17-update.zip`. Obsah ZIP začíná
 6. Teprve po testu na stagingu schvalte ostré nasazení. Při problému obnovte předchozí ZIP a zálohu databáze.
 
 ## Nastavení dalších mikrokomunit
-1. Na čistém WordPress webu nahrajte ZIP a aktivujte plugin.
+1. Na čistém WordPress webu nahrajte ZIP a aktivujte plugin. Dále použijte **Fresh Community → První instalace** pro vytvoření chybějících stránek, viz [podrobný návod](PRVNI-INSTALACE.md).
 2. Vytvořte stránku pro komunitu, např. `/komunita/`, s `[ar_live]`.
 3. Ve **Fresh Community → Nastavení** vyberte tuto stránku a vyplňte **název, krátký název PWA a popis**.
 4. Ponechte vypnuté nepotřebné moduly: produkty/obchod, Premium, Affiliate, YouTube, sportovní pole. Zvlášť rozhodněte, zda chcete spodní menu na celém webu či komunitní Woo dashboard.

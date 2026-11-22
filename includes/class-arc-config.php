@@ -18,6 +18,7 @@ final class ARC_Config {
         $legacy = self::legacy_site();
         return [
             'name' => $legacy ? 'Adrenaline Live' : 'Fresh Community',
+            'registration_mode' => $legacy ? 'public' : 'invite',
             'short_name' => $legacy ? 'AR Live' : 'Komunita',
             'description' => $legacy ? 'Komunita sportovců, turistů a aktivních lidí. Žij. Zažívej. Sdílej.' : 'Komunita pro lidi se společnými zájmy.',
             'app_page_id' => $legacy ? (int) get_page_by_path('app')->ID : 0,
@@ -95,6 +96,8 @@ final class ARC_Config {
         $defaults = self::defaults();
         $old = self::all();
         $values = [];
+        $mode=sanitize_key((string)wp_unslash($post['arc_registration_mode']??$old['registration_mode']));
+        $values['registration_mode']=in_array($mode,['public','invite'],true)?$mode:'invite';
         foreach (['name', 'short_name', 'description'] as $key) {
             $value = sanitize_text_field((string) wp_unslash($post['arc_'.$key] ?? ''));
             $max = $key === 'description' ? 220 : ($key === 'name' ? 80 : 28);

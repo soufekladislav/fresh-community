@@ -41,7 +41,7 @@ final class ARC_Live_API {
     public static function invite(WP_REST_Request $r): array|WP_Error { self::fresh(); return ARC_Account::invite(get_current_user_id(),$r); }
     public static function invite_link(): array|WP_Error {
         self::fresh();$uid=get_current_user_id();
-        if(ARC_Profile::visibility($uid)==='private')return self::err('Pro zasílání pozvánek nastav profil na Viditelný v síti nebo Veřejný.',403);
+        if(ARC_Profile::visibility($uid)==='private' && !current_user_can('manage_options'))return self::err('Pro zasílání pozvánek nastav profil na Viditelný v síti nebo Veřejný.',403);
         $key='arc_invite_link_rate_'.$uid;$n=(int)get_transient($key);
         if($n>=30)return self::err('Limit pozvánek byl dosažen.',429);
         set_transient($key,$n+1,HOUR_IN_SECONDS);

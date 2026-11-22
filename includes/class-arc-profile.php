@@ -53,6 +53,8 @@ final class ARC_Profile {
         return $alias!==''?$alias:'Člen #'.$uid;
     }
     public static function can_view(int $uid,int $viewer): bool {
+        // A public WP customer profile must not automatically enter a closed community directory.
+        if(ARC_Access::invite_only() && !ARC_Access::member($uid) && !($viewer && user_can($viewer,'manage_options')))return false;
         if($viewer && ($viewer===$uid || user_can($viewer,'manage_options'))) return true;
         if(get_user_meta($uid,'_arc_community_suspended',true))return false;
         $v=self::visibility($uid);
@@ -67,9 +69,9 @@ final class ARC_Profile {
             'visibility'=>self::visibility($uid),
             'bio'=>self::bio_html((string)get_user_meta($uid,ARC_Data::META_BIO,true)),
             'interests'=>sanitize_text_field((string)get_user_meta($uid,ARC_Data::META_INTERESTS,true)),
-            'sport_relation'=>sanitize_text_field((string)get_user_meta($uid,'_arc_sport_relation',true)),
-            'sport_profession'=>sanitize_text_field((string)get_user_meta($uid,'_arc_sport_profession',true)),
-            'sport_experience'=>sanitize_textarea_field((string)get_user_meta($uid,'_arc_sport_experience',true)),
+            'sport_relation'=>ARC_Config::enabled('sport_fields') ? sanitize_text_field((string)get_user_meta($uid,'_arc_sport_relation',true)) : '',
+            'sport_profession'=>ARC_Config::enabled('sport_fields') ? sanitize_text_field((string)get_user_meta($uid,'_arc_sport_profession',true)) : '',
+            'sport_experience'=>ARC_Config::enabled('sport_fields') ? sanitize_textarea_field((string)get_user_meta($uid,'_arc_sport_experience',true)) : '',
             'url'=>ARC_Data::member_url($uid),
             'avatar'=>self::avatar_url($uid), // Only shown if permission check above passed; no Gravatar from billing email.
             'connected'=>$viewer>0?ARC_Relations::connected($uid,$viewer):false,
