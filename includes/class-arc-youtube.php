@@ -203,6 +203,7 @@ final class ARC_YouTube {
         return isset($allowed[$ext]) && in_array((string)$mime,$allowed[$ext],true);
     }
     public static function submit(): void {
+        if (!ARC_Config::enabled('show_youtube'))wp_die('Nahrávání videí není v této komunitě aktivní.', '', ['response'=>403]);
         if (!is_user_logged_in())wp_die('Nejdříve se přihlas.', '', ['response'=>403]);
         check_admin_referer('arc_yt_submit');
         $uid=get_current_user_id();
@@ -244,6 +245,7 @@ final class ARC_YouTube {
         wp_safe_redirect(add_query_arg('arc_youtube',$note,remove_query_arg('arc_youtube',$url)));exit;
     }
     public static function shortcode(): string {
+        if (!ARC_Config::enabled('show_youtube'))return '';
         if (!is_user_logged_in())return '<p>Pro nahrání videa se přihlas.</p>';
         ob_start();self::form_contents();return (string)ob_get_clean();
     }
@@ -268,6 +270,7 @@ final class ARC_YouTube {
         echo '<button type="submit" class="arc-live-button">Odeslat video ke schválení</button></form></div>';
     }
     public static function menu(): void {
+        if(!ARC_Config::enabled('show_youtube'))return;
         add_submenu_page('ar-community','YouTube kanál','YouTube','manage_options','arc-youtube',[self::class,'admin_page']);
     }
     public static function admin_page(): void {
