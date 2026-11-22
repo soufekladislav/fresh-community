@@ -9,7 +9,7 @@ final class ARC_Invites {
         if(ARC_Profile::visibility($inviter)==='private')return '';
         $token=bin2hex(random_bytes(24));
         set_transient(self::key($token),$inviter,self::TTL);
-        $url=add_query_arg('arc_invite',$token,home_url('/muj-ucet/'));
+        $url=add_query_arg('arc_invite',$token,function_exists('wc_get_page_permalink') ? wc_get_page_permalink('myaccount') : wp_registration_url());
         if(class_exists('Fresh_Affiliate_DB') && class_exists('Fresh_Affiliate_Tracker')) {
             $affiliate=Fresh_Affiliate_DB::get_affiliate_by_user($inviter);
             if($affiliate && (string)$affiliate->status==='active') {
@@ -57,7 +57,7 @@ final class ARC_Invites {
     public static function notice(): void {
         $inviter=self::inviter(self::token());
         if(!$inviter || is_user_logged_in())return;
-        echo '<div class="woocommerce-info">Pozvánka do Adrenaline Live od '.esc_html(ARC_Profile::display_alias($inviter)).'. Dokončením registrace se stanete přáteli v jeho komunitě. Pokud je zvoucí také referenčním partnerem, uplatní se pravidla referenčního programu Adrenaline Race.</div>';
+        echo '<div class="woocommerce-info">Pozvánka do '.esc_html(ARC_Config::name()).' od '.esc_html(ARC_Profile::display_alias($inviter)).'. Dokončením registrace se stanete přáteli v jeho komunitě. Pokud je zvoucí také referenčním partnerem, mohou se uplatnit pravidla referenčního programu.</div>';
     }
     public static function on_register(int $uid): void {
         $token=self::token();$inviter=self::inviter($token);
@@ -113,11 +113,10 @@ final class ARC_Invites {
         $url=self::issue($uid);
         if($url==='')return false;
         $name=ARC_Profile::display_alias($uid);
-        return wp_mail($email,'Pozvánka do Adrenaline Live',
-          "Ahoj,\n\n".$name." tě zve do sportovní komunity Adrenaline Live.\n".
+        return wp_mail($email,'Pozvánka do '.ARC_Config::name(),
+          "Ahoj,\n\n".$name." tě zve do komunity ".ARC_Config::name().".\n".
           "Otevři pozvánku a vytvoř účet: ".$url."\n\n".
-          "Při registraci se automaticky připojíš ke zvoucímu jako přítel.\n".
-          "Pokud je zvoucí referenční partner, mohou platit pravidla referenčního programu.\n\n".
-          "Adrenaline Race\n");
+          "Při registraci se automaticky připojíš ke zvoucímu jako přítel.\n\n".
+          ARC_Config::name()."\n");
     }
 }
