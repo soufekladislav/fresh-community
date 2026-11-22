@@ -38,6 +38,15 @@ final class ARC_Setup {
         return (string)$page->post_content.' '.(string)get_post_meta($page->ID,'_elementor_data',true);
     }
     private static function existing(string $key,array $spec): ?WP_Post {
+        if($key==='wall' && ARC_Config::app_page_id()) {
+            $page=get_post(ARC_Config::app_page_id());
+            if($page instanceof WP_Post && str_contains(self::source($page),$spec['shortcode'])) return $page;
+        }
+        $known=['profile'=>'arc_page_profile','people'=>'arc_page_people'];
+        if(isset($known[$key])){
+            $id=absint(get_option($known[$key],0));
+            if($id){$p=get_post($id);if($p instanceof WP_Post && str_contains(self::source($p),$spec['shortcode']))return $p;}
+        }
         $saved=self::id($key);
         if ($saved) { $page=get_post($saved); if($page instanceof WP_Post)return $page; }
         $page=get_page_by_path($spec['slug'],OBJECT,'page');
@@ -47,7 +56,7 @@ final class ARC_Setup {
         if(!current_user_can('manage_options'))wp_die('Nemáš oprávnění.',403);
         check_admin_referer('arc_setup_pages');
         // AR sites have an existing /app/ layout. Never override it.
-        if(ARC_Config::legacy_site()) {
+        if(ARC_Config::legacy_site() && !ARC_Config::app_page_id()) {
             $app=get_page_by_path('app',OBJECT,'page');
             if($app instanceof WP_Post) {
                 update_option('arc_setup_page_wall',(int)$app->ID,false);
@@ -57,7 +66,7 @@ final class ARC_Setup {
         }
         $created=0;$reused=0;$conflicts=[];
         foreach(self::PAGES as $key=>$spec) {
-            if($key==='wall' && ARC_Config::legacy_site())continue;
+            if($key==='wall' && ARC_Config::legacy_site() && ARC_Config::app_page_id())continue;
             $page=self::existing($key,$spec);
             if($page instanceof WP_Post) {
                 if(str_contains(self::source($page),$spec['shortcode'])) {
