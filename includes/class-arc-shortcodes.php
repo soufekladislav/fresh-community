@@ -57,6 +57,7 @@ final class ARC_Shortcodes {
         self::assets();
         wp_enqueue_script('arc-account-extra');
         wp_enqueue_script('arc-notifications');
+        if(ARC_Access::invite_only() && !ARC_Access::member())return ARC_Access::denied();
         if(!is_user_logged_in()) return '<div class="arc-wrap"><p>Pro správu komunitního profilu se prosím přihlas nebo registruj.</p></div>';
         if(isset($_GET['arc_profile_preview'])) return self::profile();
         $uid=get_current_user_id();
@@ -130,6 +131,7 @@ final class ARC_Shortcodes {
     /** Responsive community friends. Account dashboard keeps its legacy compact tools. */
     public static function friends_page(): string {
         self::assets();wp_enqueue_style('arc-social-pages');wp_enqueue_script('arc-social-pages');
+        if(ARC_Access::invite_only() && !ARC_Access::member())return ARC_Access::denied();
         if(!is_user_logged_in())return '<div class="arc-social-shell"><p>Pro přístup k přátelům se přihlas.</p><a href="'.esc_url(wp_login_url(get_permalink())).'">Přihlásit se</a></div>';
         $linkBanner='';
         $linkToken=isset($_GET['arc_invite']) && is_scalar($_GET['arc_invite'])?sanitize_text_field(wp_unslash($_GET['arc_invite'])):'';
@@ -164,6 +166,7 @@ final class ARC_Shortcodes {
     }
     public static function notifications_page(): string {
         self::assets();wp_enqueue_style('arc-social-pages');wp_enqueue_script('arc-social-pages');
+        if(ARC_Access::invite_only() && !ARC_Access::member())return ARC_Access::denied();
         if(!is_user_logged_in())return '<div class="arc-social-shell"><p>Pro zobrazení oznámení se přihlas.</p><a href="'.esc_url(wp_login_url(get_permalink())).'">Přihlásit se</a></div>';
         return '<div class="arc-social-shell arc-social-notifications" data-arc-social="notifications" data-arc-loading="true"><header class="arc-social-heading arc-social-heading-actions"><button type="button" class="arc-social-btn" data-arc-notify-readall>Označit vše přečtené</button></header><nav class="arc-social-tabs" aria-label="Filtr oznámení"><button type="button" class="is-active" data-arc-notify-filter="all">Všechna</button><button type="button" data-arc-notify-filter="unread">Nepřečtená</button></nav><div class="arc-social-notice-list" data-arc-social-notices aria-live="polite">Načítám oznámení…</div><p data-arc-social-status class="arc-social-status" role="status" aria-live="polite"></p></div>';
     }
@@ -236,6 +239,7 @@ final class ARC_Shortcodes {
         return $html.'</div></div>';
     }
     public static function people(): string {
+        if(ARC_Access::invite_only() && !ARC_Access::member())return ARC_Access::denied();
         if(isset($_GET['ar_member'])) return self::profile();
         self::assets();
         $users=get_users(['meta_key'=>'_arc_profile_visibility','meta_value'=>'public','number'=>32,'orderby'=>'registered','order'=>'DESC']);
@@ -250,6 +254,7 @@ final class ARC_Shortcodes {
     /** One Elementor template + query arg makes a unique shareable URL for each member. */
     public static function profile(): string {
         self::assets();
+        if(ARC_Access::invite_only() && !ARC_Access::member())return ARC_Access::denied();
         $id=isset($_GET['ar_member'])?absint(wp_unslash($_GET['ar_member'])):get_current_user_id();
         if(!$id)return '<div class="arc-wrap"><p>Profil vyžaduje přihlášení nebo odkaz na člena.</p></div>';
         $viewer=get_current_user_id();$owner=$id===$viewer;
@@ -274,6 +279,7 @@ final class ARC_Shortcodes {
             if($experience!=='') $html.='<div>'.wpautop(esc_html($experience)).'</div>';
             $html.='</section>';
         }
+        if(!$owner && is_user_logged_in() && ARC_Relations::connected($viewer,$id))$html.='<p><a class="arc-account-link" href="'.esc_url(add_query_arg('with',$id,ARC_Setup::url('messages'))).'">Poslat soukromou zprávu</a></p>';
         if($owner)$html.='<p><a class="arc-account-link" href="'.esc_url(function_exists('wc_get_account_endpoint_url')?wc_get_account_endpoint_url('ar-community'):ARC_Config::app_url()).'">Upravit můj profil</a></p>';
         if($owner){
         $html.='</div><aside class="arc-profile-social"><h2>Přátelé</h2><p class="arc-profile-vis"><strong>Viditelnost profilu:</strong> '.esc_html(['private'=>'Soukromý – pouze já','network'=>'Jen potvrzení přátelé','public'=>'Veřejný – všichni'][ARC_Profile::visibility($id)]??'Soukromý').'</p>';
