@@ -5,7 +5,7 @@ Datum: 22. 11. 2026. Stav: **vývojová větev / PR, ne produkčně schválená 
 - Hlavička pluginu: obecný popis, synchronizované `Version` a `ARC_VERSION`, oddělené `Update URI` pro ruční distribuci mimo WordPress.org.
 - Nový `ARC_Config`: identita komunity, popis, hlavní stránka, URL obchodu, volitelné moduly WooCommerce/Premium/Affiliate/YouTube, sportovní pole, globální navigace a úpravy Woo nástěnky.
 - Frontend a e-mail: názvy, pozvánky, oznámení a většina hardcoded `/app/` odkazů se odvozují z nastavení.
-- PWA: dynamický název, manifest, start URL a scope podle vybrané komunitní stránky. **Po změně stránky PWA je nutný ruční test již nainstalovaných zařízení.**
+- PWA: dynamický název, manifest, start URL, editovatelné ikony a barvy a scope podle vybrané komunitní stránky. **Po změně stránky PWA je nutný ruční test již nainstalovaných zařízení.**
 - Nové mikrokomunity mohou provozovat základní zeď i bez WooCommerce; obchodní části jsou volitelné.
 - Stávající Adrenaline Live používá výchozí nastavení odvozené od `/app/` s existujícím shortcodem, dokud ho správce nepřepíše.
 - `scripts/build-update.sh` vytváří ZIP s přesným kořenem `ar-community/`, připravený pro nahrazení pluginu bez odinstalace.
